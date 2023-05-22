@@ -62,7 +62,7 @@ namespace StaticReflection.Benchmark.Actions
         {
             for (int i = 0; i < LoopCount; i++)
             {
-                StudentGo1T0P1MReflection.Instance.Invoke(student,ref i);
+                StudentGoT0P1MReflection.Instance.Invoke(student,ref i);
             }
         }
     }
