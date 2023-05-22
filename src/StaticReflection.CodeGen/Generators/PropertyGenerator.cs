@@ -3,6 +3,8 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System.Diagnostics;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace StaticReflection.CodeGen.Generators
@@ -42,7 +44,7 @@ namespace StaticReflection.CodeGen.Generators
 
         protected virtual string GetAccessibilityString(Accessibility accessibility)
         {
-            if (accessibility== Accessibility.Private)
+            if (accessibility == Accessibility.Private)
             {
                 return "private";
             }
@@ -64,7 +66,17 @@ namespace StaticReflection.CodeGen.Generators
             }
             return string.Empty;
         }
+        protected List<string> GetAttributeStrings(IEnumerable<AttributeData> attributes)
+        {
+            var attributeStrs = new List<string>();
 
+            foreach (var attr in attributes)
+            {
+                var attrStr = $"new {attr.AttributeClass}({string.Join(",", attr.ConstructorArguments.Where(x => !x.IsNull).Select(x => x.ToCSharpString()))}) {{ {string.Join(",", attr.NamedArguments.Select(x => $"{x.Key}={x.Value.ToCSharpString()}"))} }}";
+                attributeStrs.Add(attrStr);
+            }
+            return attributeStrs;
+        }
         protected void Execute(SourceProductionContext context, GeneratorTransformResult<TypeDeclarationSyntax> node)
         {
             var sn = node.SyntaxContext.SemanticModel;
@@ -75,7 +87,7 @@ namespace StaticReflection.CodeGen.Generators
             //var selectType = attributeTypeValue?.FullName ?? targetType.ToString();
 
             var members = targetType.GetMembers();
-            var properyies = members.OfType<IPropertySymbol>().ToList();
+            var properyies = members.OfType<IPropertySymbol>().Where(x => !x.IsIndexer).ToList();
             var visibility = GetAccessibilityString(targetType.DeclaredAccessibility);
 
             var nameSpace = targetType.ContainingNamespace.ToString();
@@ -83,16 +95,26 @@ namespace StaticReflection.CodeGen.Generators
 
             foreach (var property in properyies)
             {
-                var str= $@"
-using StaticReflection;
-
+                var ssr = name + property.Name + "StaticReflection";
+                var attributeStrs = GetAttributeStrings(property.GetAttributes());
+                var str = $@"
 namespace {nameSpace}
 {{
-    {visibility} static class {name}{property.Name}StaticReflection
+    [System.Diagnostics.DebuggerStepThrough]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    {visibility} static class {ssr}
     {{
-        public static Type DeclareType {{ get; }} = typeof({targetType});
+        public static System.Type DeclareType {{ get; }} = typeof({targetType});
 
-        public static string PropertyName {{ get; }}=""{property.Name}"";
+        public static System.String PropertyName {{ get; }} = ""{property.Name}"";
+
+        public static System.Type PropertyType {{ get; }} = typeof({property.Type.ToString().TrimEnd('?')});
+
+        public static bool CanRead {{ get; }} = {(property.IsWriteOnly ? "false" : "true")};
+
+        public static bool CanWrite {{ get; }} = {(property.IsReadOnly ? "false" : "true")};
+
+        public static System.Collections.Generic.IReadOnlyList<Attribute> Attributes {{ get; }} = new Attribute[] {{ {string.Join(",", attributeStrs)} }};
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public static {property.Type} GetValue({name} instance)
@@ -105,10 +127,41 @@ namespace {nameSpace}
             instance.{property.Name} = value;
         }}
     }}
+    [System.Diagnostics.DebuggerStepThrough]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    {visibility} class {name}{property.Name}Reflection : StaticReflection.IPropertyDefine<{targetType},{property.Type}>
+    {{
+
+        public static {name}{property.Name}Reflection Instance = new {name}{property.Name}Reflection();
+        
+        private {name}{property.Name}Reflection() {{ }}
+        
+        public System.Type DeclareType {{ get; }} = {ssr}.DeclareType;
+
+        public System.String PropertyName {{ get; }} = {ssr}.PropertyName;
+
+        public System.Type PropertyType {{ get; }}={ssr}.PropertyType;
+        
+        public bool CanRead {{ get; }} = {ssr}.CanRead;
+
+        public bool CanWrite {{ get; }} = {ssr}.CanWrite;
+        
+        public System.Collections.Generic.IReadOnlyList<Attribute> Attributes {{ get; }} = {ssr}.Attributes;
+
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public {property.Type} GetValue({name} instance)
+        {{
+            return {ssr}.GetValue(instance);
+        }}
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public void SetValue({name} instance,{property.Type} value)
+        {{
+            {ssr}.SetValue(instance,value);
+        }}
+    }}
 }}
 ";
-                context.AddSource($"{name}{property.Name}{"StaticReflection"}.g.cs", str);
-
+                context.AddSource($"{name}{property.Name}{"PropertiesReflection"}.g.cs", str);
             }
             //var tree = CSharpSyntaxTree.ParseText(source);
             //var root = tree.GetRoot();

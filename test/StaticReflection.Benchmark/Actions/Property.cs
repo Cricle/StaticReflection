@@ -58,7 +58,7 @@ namespace StaticReflection.Benchmark.Actions
         {
             for (int i = 0; i < LoopCount; i++)
             {
-                _=StudentIdStaticReflection.GetValue(student);
+                _ = StudentIdReflection.Instance.GetValue(student);
             }
         }
     }

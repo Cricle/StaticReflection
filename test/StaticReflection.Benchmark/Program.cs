@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Running;
+using System.Reflection;
 
 namespace StaticReflection.Benchmark
 {
