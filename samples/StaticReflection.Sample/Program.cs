@@ -1,14 +1,17 @@
 ﻿using StaticReflection.Annotions;
 
-[assembly: StaticReflection(Type = typeof(StaticReflection.Sample.A))]
+//[assembly: StaticReflection(Type = typeof(StaticReflection.Sample.A))]
 
 namespace StaticReflection.Sample
 {
     internal class Program
     {
+        [StaticReflection]
+        public A a { get; set; }
+
         static void Main(string[] args)
         {
-            //Console.WriteLine(string.Join(",", AReflection.Instance.Properties.Select(x => $"{x.PropertyType} {x.Name}")));
+            Console.WriteLine(string.Join(",", AReflection.Instance.Properties.Select(x => $"{x.PropertyType} {x.Name}")));
         }
     }
     public class A

@@ -85,10 +85,6 @@ namespace StaticReflection.CodeGen.Generators
         {
             return b ? "true" : "false";
         }
-        private static INamedTypeSymbol? GetSymbolFromType(Type type, SemanticModel semanticModel)
-        {
-            return semanticModel.LookupSymbols(0, name: type.Name).FirstOrDefault() as INamedTypeSymbol;
-        }
         protected void Execute(SourceProductionContext context, GeneratorTransformResult<ISymbol> node)
         {
             var sn = node.SyntaxContext.SemanticModel;
@@ -98,8 +94,11 @@ namespace StaticReflection.CodeGen.Generators
                 var attribute = targetType.GetAttributes().First(x => x.AttributeClass?.ToString() == StaticReflectionAttributeConsts.Name);
                 targetType = (attribute.NamedArguments.FirstOrDefault(x => x.Key == StaticReflectionAttributeConsts.TypeName).Value.Value as INamedTypeSymbol)?.OriginalDefinition?? targetType;
             }
-
-            var nameTypeTarget = (INamedTypeSymbol)targetType!;
+            INamedTypeSymbol? nameTypeTarget = targetType as INamedTypeSymbol;
+            if (targetType is IPropertySymbol propertySymbol)
+            {
+                nameTypeTarget = propertySymbol.Type as INamedTypeSymbol;
+            }
 
             var properties=ExecuteProperty(context, node, nameTypeTarget);
             var methods = ExecuteMethods(context, node, nameTypeTarget);
@@ -118,37 +117,37 @@ namespace {nameSpace}
     {{
         public static readonly {ssr} Instance = new {ssr}();
 
-        public System.Type DeclareType {{ get; }} = typeof({targetType});
+        public System.Type DeclareType {{ get; }} = typeof({nameTypeTarget});
 
-        public System.String Name {{ get; }} = ""{targetType.Name}"";
+        public System.String Name {{ get; }} = ""{nameTypeTarget.Name}"";
 
-        public System.String MetadataName {{ get; }} = ""{targetType.MetadataName}"";
+        public System.String MetadataName {{ get; }} = ""{nameTypeTarget.MetadataName}"";
 
-        public System.Boolean IsVirtual {{ get; }} = {BoolToString(targetType.IsVirtual)};
+        public System.Boolean IsVirtual {{ get; }} = {BoolToString(nameTypeTarget.IsVirtual)};
 
-        public System.Boolean IsStatic {{ get; }} = {BoolToString(targetType.IsStatic)};
+        public System.Boolean IsStatic {{ get; }} = {BoolToString(nameTypeTarget.IsStatic)};
 
-        public System.Boolean IsOverride {{ get; }} = {BoolToString(targetType.IsOverride)};
+        public System.Boolean IsOverride {{ get; }} = {BoolToString(nameTypeTarget.IsOverride)};
 
-        public System.Boolean IsAbstract {{ get; }} = {BoolToString(targetType.IsAbstract)};
+        public System.Boolean IsAbstract {{ get; }} = {BoolToString(nameTypeTarget.IsAbstract)};
 
-        public System.Boolean IsSealed {{ get; }} = {BoolToString(targetType.IsSealed)};
+        public System.Boolean IsSealed {{ get; }} = {BoolToString(nameTypeTarget.IsSealed)};
 
-        public System.Boolean IsDefinition {{ get; }} = {BoolToString(targetType.IsDefinition)};
+        public System.Boolean IsDefinition {{ get; }} = {BoolToString(nameTypeTarget.IsDefinition)};
 
-        public System.Boolean IsExtern {{ get; }} = {BoolToString(targetType.IsExtern)};
+        public System.Boolean IsExtern {{ get; }} = {BoolToString(nameTypeTarget.IsExtern)};
 
-        public System.Boolean IsImplicitlyDeclared {{ get; }} = {BoolToString(targetType.IsImplicitlyDeclared)};
+        public System.Boolean IsImplicitlyDeclared {{ get; }} = {BoolToString(nameTypeTarget.IsImplicitlyDeclared)};
         
-        public System.Boolean CanBeReferencedByName {{ get; }} = {BoolToString(targetType.CanBeReferencedByName)};
+        public System.Boolean CanBeReferencedByName {{ get; }} = {BoolToString(nameTypeTarget.CanBeReferencedByName)};
         
-        public System.Boolean IsPublic {{ get; }} = {BoolToString(targetType.DeclaredAccessibility == Accessibility.Public)};
+        public System.Boolean IsPublic {{ get; }} = {BoolToString(nameTypeTarget.DeclaredAccessibility == Accessibility.Public)};
         
-        public System.Boolean IsPrivate {{ get; }} = {BoolToString(targetType.DeclaredAccessibility == Accessibility.Private)};
+        public System.Boolean IsPrivate {{ get; }} = {BoolToString(nameTypeTarget.DeclaredAccessibility == Accessibility.Private)};
         
-        public System.Boolean IsProtected {{ get; }} = {BoolToString(targetType.DeclaredAccessibility == Accessibility.Protected || targetType.DeclaredAccessibility == Accessibility.ProtectedAndInternal)};
+        public System.Boolean IsProtected {{ get; }} = {BoolToString(nameTypeTarget.DeclaredAccessibility == Accessibility.Protected || nameTypeTarget.DeclaredAccessibility == Accessibility.ProtectedAndInternal)};
         
-        public System.Boolean IsInternal {{ get; }} = {BoolToString(targetType.DeclaredAccessibility == Accessibility.Internal || targetType.DeclaredAccessibility == Accessibility.ProtectedAndInternal)};
+        public System.Boolean IsInternal {{ get; }} = {BoolToString(nameTypeTarget.DeclaredAccessibility == Accessibility.Internal || nameTypeTarget.DeclaredAccessibility == Accessibility.ProtectedAndInternal)};
 
         public System.Collections.Generic.IReadOnlyList<System.Attribute> Attributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", attributeStrs)} }};
 
@@ -160,7 +159,7 @@ namespace {nameSpace}
     }}
 }}
 "; 
-            context.AddSource($"{targetType.Name}{"Reflection"}.g.cs", str);
+            context.AddSource($"{nameTypeTarget.Name}{"Reflection"}.g.cs", str);
 
         }
 
