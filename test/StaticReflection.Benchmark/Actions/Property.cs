@@ -1,16 +1,10 @@
 ﻿using BenchmarkDotNet.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace StaticReflection.Benchmark.Actions
 {
+
     [MemoryDiagnoser]
     public class Property
     {
@@ -58,7 +52,7 @@ namespace StaticReflection.Benchmark.Actions
         {
             for (int i = 0; i < LoopCount; i++)
             {
-                _ = StudentIdReflection.Instance.GetValue(student);
+                _ = StudentIdPReflection.Instance.GetValue(student);
             }
         }
     }
