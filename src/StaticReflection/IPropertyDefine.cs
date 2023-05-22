@@ -1,6 +1,12 @@
 ﻿namespace StaticReflection
 {
-    public interface IPropertyDefine<TInstance, TResult> : IAttributeDefine, IMemberDefine
+    public interface IPropertyInvokeDefine<TInstance, TResult>
+    {
+        void SetValue(TInstance instance, TResult value);
+
+        TResult GetValue(TInstance instance);
+    }
+    public interface IPropertyDefine : IAttributeDefine, IMemberDefine
     {    
         Type PropertyType { get; }
 
@@ -19,9 +25,5 @@
         IReadOnlyList<Attribute> GetterAttributes { get; }
 
         IReadOnlyList<Attribute> SetterAttributes { get; }
-
-        void SetValue(TInstance instance, TResult value);
-
-        TResult GetValue(TInstance instance);
     }
 }

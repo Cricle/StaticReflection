@@ -8,13 +8,13 @@ namespace StaticReflection.CodeGen.Generators
 {
     public partial class StaticReflectionGenerator
     {
-        protected void ExecuteProperty(SourceProductionContext context, GeneratorTransformResult<TypeDeclarationSyntax> node,INamedTypeSymbol targetType)
+        protected List<string> ExecuteProperty(SourceProductionContext context, GeneratorTransformResult<TypeDeclarationSyntax> node,INamedTypeSymbol targetType)
         {
             var members = targetType.GetMembers();
             var properyies = members.OfType<IPropertySymbol>().Where(x => !x.IsIndexer).ToList();
             if (properyies.Count == 0)
             {
-                return;
+                return new List<string>(0);
             }
             var visibility = GetAccessibilityString(targetType.DeclaredAccessibility);
 
@@ -24,6 +24,8 @@ namespace StaticReflection.CodeGen.Generators
             var scriptBuilder = new StringBuilder($"namespace {nameSpace}");
             scriptBuilder.AppendLine();
             scriptBuilder.AppendLine("{");
+
+            var types = new List<string>();
 
             foreach (var property in properyies)
             {
@@ -53,10 +55,13 @@ namespace StaticReflection.CodeGen.Generators
                         setBody = $"instance.{property.Name} = value;";
                     }
                 }
+
+                types.Add(ssr);
+
                 var str = $@"
     [System.Diagnostics.DebuggerStepThrough]
     [System.Runtime.CompilerServices.CompilerGenerated]
-    {visibility} class {ssr}
+    {visibility} sealed class {ssr}:IPropertyInvokeDefine<{targetType},{property.Type}>,IPropertyDefine
     {{
         public static readonly {ssr} Instance = new {ssr}();
 
@@ -129,7 +134,7 @@ namespace StaticReflection.CodeGen.Generators
             scriptBuilder.AppendLine();
             scriptBuilder.AppendLine("}");
             context.AddSource($"{name}{"PropertiesReflection"}.g.cs", scriptBuilder.ToString());
-
+            return types;
         }
     }
 }

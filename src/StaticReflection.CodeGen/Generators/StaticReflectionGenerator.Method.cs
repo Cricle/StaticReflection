@@ -7,13 +7,13 @@ namespace StaticReflection.CodeGen.Generators
 {
     public partial class StaticReflectionGenerator
     {
-        protected void ExecuteMethods(SourceProductionContext context, GeneratorTransformResult<TypeDeclarationSyntax> node, INamedTypeSymbol targetType)
+        protected List<string> ExecuteMethods(SourceProductionContext context, GeneratorTransformResult<TypeDeclarationSyntax> node, INamedTypeSymbol targetType)
         {
             var members = targetType.GetMembers();
             var methods = members.OfType<IMethodSymbol>().Where(x=>x.MethodKind== MethodKind.Ordinary).ToList();
             if (methods.Count==0)
             {
-                return;
+                return new List<string>(0);
             }
             var visibility = GetAccessibilityString(targetType.DeclaredAccessibility);
 
@@ -24,6 +24,8 @@ namespace StaticReflection.CodeGen.Generators
             scriptBuilder.AppendLine("#pragma warning disable CS9082");
             scriptBuilder.AppendLine($"namespace {nameSpace}");
             scriptBuilder.AppendLine("{");
+
+            var types = new List<string>();
 
             foreach (var method in methods)
             {
@@ -150,11 +152,11 @@ return ref result;
                         throw new NotSupportedException(symbol.RefKind.ToString());
                     }
                 }
-
+                types.Add(ssr);
                 var str = $@"
     [System.Diagnostics.DebuggerStepThrough]
     [System.Runtime.CompilerServices.CompilerGenerated]
-    {visibility} class {ssr} : StaticReflection.IMethodDefine{implementInvokeInterface}
+    {visibility} sealed class {ssr} : StaticReflection.IMethodDefine{implementInvokeInterface}
     {{
         public static readonly {ssr} Instance = new {ssr}();
 
@@ -239,6 +241,8 @@ return ref result;
 
             var code = FormatCode(scriptBuilder.ToString());
             context.AddSource($"{name}{"MethodsReflection"}.g.cs", code);
+
+            return types;
         }
     }
 }

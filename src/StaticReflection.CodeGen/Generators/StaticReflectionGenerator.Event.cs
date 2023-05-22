@@ -7,14 +7,14 @@ namespace StaticReflection.CodeGen.Generators
 {
     public partial class StaticReflectionGenerator
     {
-        protected void ExecuteEvents(SourceProductionContext context, GeneratorTransformResult<TypeDeclarationSyntax> node, INamedTypeSymbol targetType)
+        protected List<string> ExecuteEvents(SourceProductionContext context, GeneratorTransformResult<TypeDeclarationSyntax> node, INamedTypeSymbol targetType)
         {
             var members = targetType.GetMembers();
             var ev = members.OfType<IEventSymbol>().ToList();
             var events = members.OfType<IEventSymbol>().Where(x=>x.Type is INamedTypeSymbol symbol&&symbol.DelegateInvokeMethod!=null).ToList();
             if (events.Count==0)
             {
-                return;
+                return new List<string>(0);
             }
             var visibility = GetAccessibilityString(targetType.DeclaredAccessibility);
 
@@ -24,16 +24,21 @@ namespace StaticReflection.CodeGen.Generators
             var scriptBuilder = new StringBuilder();
             scriptBuilder.AppendLine($"namespace {nameSpace}");
             scriptBuilder.AppendLine("{");
+
+            var types = new List<string>();
+
             foreach (var @event in events)
             {
                 var ssr = name + @event.Name + "EReflection";
                 var attributeStrs = GetAttributeStrings(@event.GetAttributes());
                 var delegateInvokeMethod = ((INamedTypeSymbol)@event.Type).DelegateInvokeMethod!;
 
+                types.Add(ssr);
+
                 var str = $@"
     [System.Diagnostics.DebuggerStepThrough]
     [System.Runtime.CompilerServices.CompilerGenerated]
-    {visibility} class {ssr}:IEventDefine
+    {visibility} sealed class {ssr}:IEventDefine
     {{
         public static readonly {ssr} Instance = new {ssr}();
 
@@ -95,6 +100,8 @@ namespace StaticReflection.CodeGen.Generators
 
             var code = FormatCode(scriptBuilder.ToString());
             context.AddSource($"{name}{"EventsReflection"}.g.cs", code);
+
+            return types;
         }
     }
 }

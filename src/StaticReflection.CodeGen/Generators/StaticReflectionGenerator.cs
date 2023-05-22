@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Xml.Linq;
 
 namespace StaticReflection.CodeGen.Generators
 {
@@ -89,9 +90,67 @@ namespace StaticReflection.CodeGen.Generators
             var attributeTypeValue = (Type?)attribute.NamedArguments.FirstOrDefault(x => x.Key == StaticReflectionAttributeConsts.TypeName).Value.Value;
             //var selectType = attributeTypeValue?.FullName ?? targetType.ToString();
 
-            ExecuteProperty(context, node, targetType);
-            ExecuteMethods(context, node, targetType);
-            ExecuteEvents(context, node, targetType);
+            var properties=ExecuteProperty(context, node, targetType);
+            var methods = ExecuteMethods(context, node, targetType);
+            var events = ExecuteEvents(context, node, targetType);
+
+            var ssr = $"{targetType.Name}Reflection";
+            var visibility = GetAccessibilityString(targetType.DeclaredAccessibility);
+
+            var nameSpace = targetType.ContainingNamespace.ToString();
+            var attributeStrs = GetAttributeStrings(targetType.GetAttributes());
+
+            var str = $@"
+namespace {nameSpace}
+{{
+    {visibility} sealed class {ssr} : ITypeDefine
+    {{
+        public static readonly {ssr} Instance = new {ssr}();
+
+        public System.Type DeclareType {{ get; }} = typeof({targetType});
+
+        public System.String Name {{ get; }} = ""{targetType.Name}"";
+
+        public System.String MetadataName {{ get; }} = ""{targetType.MetadataName}"";
+
+        public System.Boolean IsVirtual {{ get; }} = {BoolToString(targetType.IsVirtual)};
+
+        public System.Boolean IsStatic {{ get; }} = {BoolToString(targetType.IsStatic)};
+
+        public System.Boolean IsOverride {{ get; }} = {BoolToString(targetType.IsOverride)};
+
+        public System.Boolean IsAbstract {{ get; }} = {BoolToString(targetType.IsAbstract)};
+
+        public System.Boolean IsSealed {{ get; }} = {BoolToString(targetType.IsSealed)};
+
+        public System.Boolean IsDefinition {{ get; }} = {BoolToString(targetType.IsDefinition)};
+
+        public System.Boolean IsExtern {{ get; }} = {BoolToString(targetType.IsExtern)};
+
+        public System.Boolean IsImplicitlyDeclared {{ get; }} = {BoolToString(targetType.IsImplicitlyDeclared)};
+        
+        public System.Boolean CanBeReferencedByName {{ get; }} = {BoolToString(targetType.CanBeReferencedByName)};
+        
+        public System.Boolean IsPublic {{ get; }} = {BoolToString(targetType.DeclaredAccessibility == Accessibility.Public)};
+        
+        public System.Boolean IsPrivate {{ get; }} = {BoolToString(targetType.DeclaredAccessibility == Accessibility.Private)};
+        
+        public System.Boolean IsProtected {{ get; }} = {BoolToString(targetType.DeclaredAccessibility == Accessibility.Protected || targetType.DeclaredAccessibility == Accessibility.ProtectedAndInternal)};
+        
+        public System.Boolean IsInternal {{ get; }} = {BoolToString(targetType.DeclaredAccessibility == Accessibility.Internal || targetType.DeclaredAccessibility == Accessibility.ProtectedAndInternal)};
+
+        public System.Collections.Generic.IReadOnlyList<System.Attribute> Attributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", attributeStrs)} }};
+
+        public System.Collections.Generic.IReadOnlyList<StaticReflection.IPropertyDefine> Properties {{ get; }} = new StaticReflection.IPropertyDefine[]{{ {string.Join(",", properties.Select(x => $"{x}.Instance"))} }};
+
+        public System.Collections.Generic.IReadOnlyList<StaticReflection.IMethodDefine> Methods {{ get; }} = new StaticReflection.IMethodDefine[]{{ {string.Join(",", methods.Select(x => $"{x}.Instance"))} }};
+
+        public System.Collections.Generic.IReadOnlyList<StaticReflection.IEventDefine> Events {{ get; }} = new StaticReflection.IEventDefine[]{{ {string.Join(",", events.Select(x => $"{x}.Instance"))} }};
+    }}
+}}
+"; 
+            context.AddSource($"{targetType.Name}{"Reflection"}.g.cs", str);
+
         }
 
         protected string FormatCode(string code)
