@@ -13,6 +13,8 @@ namespace StaticReflection.Benchmark
     {
         public static double B { get; }
 
+        public event EventHandler<int> Complated;
+
         [Person(123)]
         public int Id { get; set; }
 

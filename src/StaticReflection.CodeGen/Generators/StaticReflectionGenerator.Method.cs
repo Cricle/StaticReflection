@@ -11,6 +11,10 @@ namespace StaticReflection.CodeGen.Generators
         {
             var members = targetType.GetMembers();
             var methods = members.OfType<IMethodSymbol>().Where(x=>x.MethodKind== MethodKind.Ordinary).ToList();
+            if (methods.Count==0)
+            {
+                return;
+            }
             var visibility = GetAccessibilityString(targetType.DeclaredAccessibility);
 
             var nameSpace = targetType.ContainingNamespace.ToString();
@@ -194,7 +198,7 @@ return ref result;
 
         public System.Type ReturnType {{ get; }} = typeof({method.ReturnType});     
 
-        public System.Collections.Generic.IReadOnlyList<System.Type> ArgumentTypes {{ get; }} = new System.Type[]{{ {string.Join(",",method.Parameters.Select(x=>$"typeof({x.Type})"))} }};        
+        public System.Collections.Generic.IReadOnlyList<System.Type> ArgumentTypes {{ get; }} = new System.Type[]{{ {string.Join(",",method.Parameters.Select(x=>$"typeof({x.Type.ToString().TrimEnd('?')})"))} }};        
          
         public System.Boolean IsGenericMethod {{ get; }} = {BoolToString(method.IsGenericMethod)};      
 

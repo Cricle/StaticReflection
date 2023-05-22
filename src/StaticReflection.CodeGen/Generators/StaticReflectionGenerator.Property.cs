@@ -12,6 +12,10 @@ namespace StaticReflection.CodeGen.Generators
         {
             var members = targetType.GetMembers();
             var properyies = members.OfType<IPropertySymbol>().Where(x => !x.IsIndexer).ToList();
+            if (properyies.Count == 0)
+            {
+                return;
+            }
             var visibility = GetAccessibilityString(targetType.DeclaredAccessibility);
 
             var nameSpace = targetType.ContainingNamespace.ToString();

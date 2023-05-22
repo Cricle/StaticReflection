@@ -91,6 +91,7 @@ namespace StaticReflection.CodeGen.Generators
 
             ExecuteProperty(context, node, targetType);
             ExecuteMethods(context, node, targetType);
+            ExecuteEvents(context, node, targetType);
         }
 
         protected string FormatCode(string code)
