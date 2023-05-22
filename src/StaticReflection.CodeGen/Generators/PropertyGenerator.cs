@@ -92,5 +92,12 @@ namespace StaticReflection.CodeGen.Generators
             ExecuteProperty(context, node, targetType);
             ExecuteMethods(context, node, targetType);
         }
+
+        protected string FormatCode(string code)
+        {
+            var tree = CSharpSyntaxTree.ParseText(code);
+            var root = tree.GetRoot();
+            return root.NormalizeWhitespace().ToFullString();
+        }
     }
 }

@@ -102,11 +102,11 @@ namespace StaticReflection.CodeGen.Generators
  
         public System.Boolean ReturnsByRefReadonly {{ get; }} = {BoolToString(property.ReturnsByRefReadonly)};        
          
-        public System.Collections.Generic.IReadOnlyList<Attribute> GetterAttributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", GetAttributeStrings(property.GetMethod?.GetAttributes()))} }};  
+        public System.Collections.Generic.IReadOnlyList<System.Attribute> GetterAttributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", GetAttributeStrings(property.GetMethod?.GetAttributes()))} }};  
         
-        public System.Collections.Generic.IReadOnlyList<Attribute> SetterAttributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", GetAttributeStrings(property.SetMethod?.GetAttributes()))} }};  
+        public System.Collections.Generic.IReadOnlyList<System.Attribute> SetterAttributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", GetAttributeStrings(property.SetMethod?.GetAttributes()))} }};  
 
-        public System.Collections.Generic.IReadOnlyList<Attribute> Attributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", attributeStrs)} }};
+        public System.Collections.Generic.IReadOnlyList<System.Attribute> Attributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", attributeStrs)} }};
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public {property.Type} GetValue({name} instance)

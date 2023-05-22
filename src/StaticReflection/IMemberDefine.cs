@@ -1,11 +1,13 @@
 ﻿namespace StaticReflection
 {
-    public interface IMemberDefine: IAttributeDefine
+    public interface IUnderType
     {
         Type DeclareType { get; }
 
         string Name { get; }
-
+    }
+    public interface IMemberDefine: IAttributeDefine, IUnderType
+    {
         string MetadataName { get; }
 
         bool IsVirtual { get; }

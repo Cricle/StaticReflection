@@ -24,6 +24,28 @@ namespace StaticReflection.Benchmark
             var q = a++;
             a = q;
         }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public string Go1(int a)
+        {
+            var q = a++;
+            a = q;
+            return "1";
+        }
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public string Go1(int a,object dq)
+        {
+            var q = a++;
+            a = q;
+            return "1";
+        }
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public void Go<T>(int a)
+            where T:Student
+        {
+            var q = a++;
+            a = q;
+        }
     }
 
     [AttributeUsage(AttributeTargets.Property)]

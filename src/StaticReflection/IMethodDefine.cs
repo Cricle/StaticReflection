@@ -33,5 +33,7 @@
         bool IsPartialDefinition { get; }
 
         bool IsConditional { get; }
+
+        IReadOnlyList<ITypeArgumentDefine> TypeArguments { get; }
     }
 }

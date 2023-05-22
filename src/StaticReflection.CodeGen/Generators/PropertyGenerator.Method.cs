@@ -16,20 +16,145 @@ namespace StaticReflection.CodeGen.Generators
             var nameSpace = targetType.ContainingNamespace.ToString();
             var name = targetType.ToString().Split('.').Last();
 
-            var scriptBuilder = new StringBuilder($"namespace {nameSpace}");
-            scriptBuilder.AppendLine();
+            var scriptBuilder = new StringBuilder();
+            scriptBuilder.AppendLine("#pragma warning disable CS9082");
+            scriptBuilder.AppendLine($"namespace {nameSpace}");
             scriptBuilder.AppendLine("{");
 
             foreach (var method in methods)
             {
-                var ssr = name + method.Name + "MReflection";
+                var ssr = name + method.Name + "T" + method.TypeParameters.Length + "P" + method.Parameters.Length + "MReflection";
                 var attributeStrs = GetAttributeStrings(method.GetAttributes());
+
+                var typePars = new List<string>();
+
+                foreach (var item in method.TypeParameters)
+                {
+                    var typePar = $"new StaticReflection.TypeArgumentDefine(\"{item.Name}\",typeof({targetType}),{BoolToString(item.HasReferenceTypeConstraint)},{BoolToString(item.HasValueTypeConstraint)},{BoolToString(item.HasUnmanagedTypeConstraint)},{BoolToString(item.HasNotNullConstraint)},{BoolToString(item.HasConstructorConstraint)},new System.Type[] {{ {string.Join(",",item.ConstraintTypes.Select(x=>$"typeof({x})"))} }})";
+                    typePars.Add(typePar);
+                }
+
+                //Arg interface inject
+
+                var implementInvokeInterface = string.Empty;
+                var invokeImplement=string.Empty;
+
+                if (!method.IsGenericMethod)
+                {
+                    var argOutof16 = method.Parameters.Length > 16;
+                    var hasReturn = !method.ReturnsVoid;
+                    implementInvokeInterface = ",";
+                    var unsafeScript = @"
+#if NETFRAMEWORK
+unsafe
+#endif
+";
+                    if (argOutof16)
+                    {
+                        if (hasReturn)
+                        {
+                            implementInvokeInterface += $"StaticReflection.Invoking.IArgsAnyMethod<{targetType},{method.ReturnType}>";
+                            invokeImplement = $"public {unsafeScript} ref {method.ReturnType} Invoke({targetType} instance, params object[] inputs)";
+                        }
+                        else
+                        {
+                            implementInvokeInterface += $"StaticReflection.Invoking.IVoidArgsAnyMethod<{targetType}>";
+                            invokeImplement = $"public {unsafeScript} void Invoke({targetType} instance, params object[] inputs)";
+                        }
+                    }
+                    else if (method.Parameters.Length == 0)
+                    {
+                        if (hasReturn)
+                        {
+                            implementInvokeInterface += $"StaticReflection.Invoking.IArgsMethod<{targetType},{method.ReturnType}>";
+                            invokeImplement = $"public {unsafeScript} ref {method.ReturnType} Invoke({targetType} instance)";
+                        }
+                        else
+                        {
+                            implementInvokeInterface += $"StaticReflection.Invoking.IVoidArgsMethod<{targetType}>";
+                            invokeImplement = $"public {unsafeScript} void Invoke({targetType} instance)";
+                        }
+                    }
+                    else
+                    {
+                        var args = string.Join(",", method.Parameters.Select((x, i) => $"ref {x.Type} arg{i}"));
+                        if (hasReturn)
+                        {
+                            implementInvokeInterface += $"StaticReflection.Invoking.IArgsMethod<{targetType},{method.ReturnType},";
+                            invokeImplement = $"public {unsafeScript} ref {method.ReturnType} Invoke({targetType} instance,{args})";
+                        }
+                        else
+                        {
+                            implementInvokeInterface += $"StaticReflection.Invoking.IVoidArgsMethod<{targetType},";
+                            invokeImplement = $"public {unsafeScript} void Invoke({targetType} instance,{args})";
+                        }
+                        implementInvokeInterface += string.Join(",", method.Parameters.Select(x=>x.Type)) + ">";
+                    }
+                    invokeImplement += "\n{\n";
+
+                    var initCodes = new StringBuilder();
+                    var bodyCodes = new List<string>();
+
+                    for (int i = 0; i < method.Parameters.Length; i++)
+                    {
+                        var par = method.Parameters[i];
+                        var line = CompileArg(par.Type.ToString(), "arg" + i, par, initCodes);
+                        bodyCodes.Add(line);
+                    }
+                    var call = $"instance.{method.Name}({string.Join(",",bodyCodes)})";
+                    if (hasReturn)
+                    {
+                        call = $@"
+ref {method.ReturnType} result =ref System.Runtime.CompilerServices.Unsafe.AsRef({call});
+return ref result;
+";
+                    }
+                    else
+                    {
+                        call += ";";
+                    }
+                    invokeImplement += initCodes;
+                    invokeImplement += $"\n{call}\n}}\n";
+                }
+
+                string CompileArg(string inputType,string inputArg,IParameterSymbol symbol,StringBuilder initCodes)
+                {
+                    if (symbol.RefKind== RefKind.None)
+                    {
+                        return $"System.Runtime.CompilerServices.Unsafe.As<{inputType},{symbol.Type}>(ref {inputArg})";
+                    }
+                    else if (symbol.RefKind== RefKind.Ref)
+                    {
+                        return $"ref System.Runtime.CompilerServices.Unsafe.As<{inputType},{symbol.Type}>(ref {inputArg})";
+                    }
+                    else if (symbol.RefKind== RefKind.RefReadOnly)
+                    {
+                        return $"ref System.Runtime.CompilerServices.Unsafe.As<{inputType},{symbol.Type}>(ref {inputArg})";
+                    }
+                    else if (symbol.RefKind== RefKind.In)
+                    {
+                        return $"in System.Runtime.CompilerServices.Unsafe.As<{inputType},{symbol.Type}>(ref {inputArg})";
+                    }
+                    else if (symbol.RefKind == RefKind.Out)
+                    {
+                        var argName= "out"+inputArg;
+                        initCodes.AppendLine($"ref {symbol.Type} {argName} = ref System.Runtime.CompilerServices.Unsafe.As<{inputType},{symbol.Type}>(ref {inputArg})");
+                        return $"out {argName}";
+                    }
+                    else
+                    {
+                        throw new NotSupportedException(symbol.RefKind.ToString());
+                    }
+                }
+
                 var str = $@"
     [System.Diagnostics.DebuggerStepThrough]
     [System.Runtime.CompilerServices.CompilerGenerated]
-    {visibility} class {ssr} : StaticReflection.IMethodDefine
+    {visibility} class {ssr} : StaticReflection.IMethodDefine{implementInvokeInterface}
     {{
         public static readonly {ssr} Instance = new {ssr}();
+
+        private {ssr}(){{ }}
 
         public System.Type DeclareType {{ get; }} = typeof({targetType});
 
@@ -95,8 +220,11 @@ namespace StaticReflection.CodeGen.Generators
 
         public System.Boolean IsConditional {{ get; }} = {BoolToString(method.IsConditional)};     
         
-        public System.Collections.Generic.IReadOnlyList<Attribute> Attributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", attributeStrs)} }};
+        public System.Collections.Generic.IReadOnlyList<System.Attribute> Attributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", attributeStrs)} }};
 
+        public System.Collections.Generic.IReadOnlyList<StaticReflection.ITypeArgumentDefine> TypeArguments {{ get; }} = new StaticReflection.ITypeArgumentDefine[] {{ {string.Join(",", typePars)} }};
+        
+        {invokeImplement}
     }}
 ";
                 scriptBuilder.AppendLine(str);
@@ -104,7 +232,9 @@ namespace StaticReflection.CodeGen.Generators
 
             scriptBuilder.AppendLine();
             scriptBuilder.AppendLine("}");
-            context.AddSource($"{name}{"MethodsReflection"}.g.cs", scriptBuilder.ToString());
+
+            var code = FormatCode(scriptBuilder.ToString());
+            context.AddSource($"{name}{"MethodsReflection"}.g.cs", code);
         }
     }
 }

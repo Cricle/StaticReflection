@@ -5,6 +5,7 @@
     <TargetFrameworks>net472;net7.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
 	  <LangVersion>latest</LangVersion>
+	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
