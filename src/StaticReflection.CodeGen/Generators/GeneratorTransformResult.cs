@@ -4,7 +4,7 @@ namespace StaticReflection.CodeGen.Generators
 {
     public class GeneratorTransformResult<T>
     {
-        public GeneratorTransformResult(T value, GeneratorSyntaxContext syntaxContext)
+        public GeneratorTransformResult(T value, GeneratorAttributeSyntaxContext syntaxContext)
         {
             Value = value;
             SyntaxContext = syntaxContext;
@@ -12,6 +12,6 @@ namespace StaticReflection.CodeGen.Generators
 
         public T Value { get; }
 
-        public GeneratorSyntaxContext SyntaxContext { get; }
+        public GeneratorAttributeSyntaxContext SyntaxContext { get; }
     }
 }

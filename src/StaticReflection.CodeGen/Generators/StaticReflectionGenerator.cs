@@ -1,6 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Diagnostics;
+using System.Dynamic;
 using System.Xml.Linq;
 
 namespace StaticReflection.CodeGen.Generators
@@ -13,29 +15,31 @@ namespace StaticReflection.CodeGen.Generators
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             this.context = context;
-            var syntaxProvider = context.SyntaxProvider.CreateSyntaxProvider(Predicate, Transform)
+            var syntaxProvider = context.SyntaxProvider
+                .ForAttributeWithMetadataName(StaticReflectionAttributeConsts.Name, Predicate, Transform)
                 .Where(x => x != null);
             context.RegisterSourceOutput(syntaxProvider, Execute!);
         }
-        protected GeneratorTransformResult<TypeDeclarationSyntax>? Transform(GeneratorSyntaxContext context, CancellationToken token)
+        protected GeneratorTransformResult<ISymbol?>? Transform(GeneratorAttributeSyntaxContext context, CancellationToken token)
         {
-            var sn = context.SemanticModel;
-            var typeSymbol = sn.GetDeclaredSymbol(context.Node, token);
-            if (typeSymbol != null &&
-                typeSymbol.GetAttributes().Any(x => x.AttributeClass?.ToString() == StaticReflectionAttributeConsts.Name))
-            {
-                return new GeneratorTransformResult<TypeDeclarationSyntax>((TypeDeclarationSyntax)context.Node, context);
-            }
-            return null;
+            return new GeneratorTransformResult<ISymbol?>(context.TargetSymbol, context);
+            //var sn = context.SemanticModel;
+            //var typeSymbol = sn.GetSymbolInfo(context.TargetNode, token).Symbol;
+            //if (typeSymbol != null &&
+            //    typeSymbol.GetAttributes().Any(x => x.AttributeClass?.ToString() == StaticReflectionAttributeConsts.Name))
+            //{
+            //    return new GeneratorTransformResult<MemberDeclarationSyntax>((MemberDeclarationSyntax)context.Node, context);
+            //}
+            //return null;
         }
         protected bool Predicate(SyntaxNode node, CancellationToken token)
         {
-            if (node is ClassDeclarationSyntax || node is InterfaceDeclarationSyntax)
-            {
-                var syntax = (TypeDeclarationSyntax)node;
-                return syntax.AttributeLists.Count != 0;
-            }
-            return false;
+            return true;
+            //if (node is MemberDeclarationSyntax)
+            //{
+            //    return true;
+            //}
+            //return false;
         }
 
         protected virtual string GetAccessibilityString(Accessibility accessibility)
@@ -81,20 +85,27 @@ namespace StaticReflection.CodeGen.Generators
         {
             return b ? "true" : "false";
         }
-        protected void Execute(SourceProductionContext context, GeneratorTransformResult<TypeDeclarationSyntax> node)
+        private static INamedTypeSymbol? GetSymbolFromType(Type type, SemanticModel semanticModel)
+        {
+            return semanticModel.LookupSymbols(0, name: type.Name).FirstOrDefault() as INamedTypeSymbol;
+        }
+        protected void Execute(SourceProductionContext context, GeneratorTransformResult<ISymbol> node)
         {
             var sn = node.SyntaxContext.SemanticModel;
-            var targetType = sn.GetDeclaredSymbol(node.Value)!;
-            //Debugger.Launch();
-            var attribute = targetType.GetAttributes().First(x => x.AttributeClass?.ToString() == StaticReflectionAttributeConsts.Name);
-            var attributeTypeValue = (Type?)attribute.NamedArguments.FirstOrDefault(x => x.Key == StaticReflectionAttributeConsts.TypeName).Value.Value;
-            //var selectType = attributeTypeValue?.FullName ?? targetType.ToString();
+            var targetType = node.SyntaxContext.TargetSymbol;
+            if (node.Value != null)
+            {
+                var attribute = targetType.GetAttributes().First(x => x.AttributeClass?.ToString() == StaticReflectionAttributeConsts.Name);
+                targetType = (attribute.NamedArguments.FirstOrDefault(x => x.Key == StaticReflectionAttributeConsts.TypeName).Value.Value as INamedTypeSymbol)?.OriginalDefinition?? targetType;
+            }
 
-            var properties=ExecuteProperty(context, node, targetType);
-            var methods = ExecuteMethods(context, node, targetType);
-            var events = ExecuteEvents(context, node, targetType);
+            var nameTypeTarget = (INamedTypeSymbol)targetType!;
 
-            var ssr = $"{targetType.Name}Reflection";
+            var properties=ExecuteProperty(context, node, nameTypeTarget);
+            var methods = ExecuteMethods(context, node, nameTypeTarget);
+            var events = ExecuteEvents(context, node, nameTypeTarget);
+
+            var ssr = $"{nameTypeTarget.Name}Reflection";
             var visibility = GetAccessibilityString(targetType.DeclaredAccessibility);
 
             var nameSpace = targetType.ContainingNamespace.ToString();

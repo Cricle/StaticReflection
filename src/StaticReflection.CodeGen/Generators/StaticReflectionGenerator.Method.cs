@@ -7,7 +7,7 @@ namespace StaticReflection.CodeGen.Generators
 {
     public partial class StaticReflectionGenerator
     {
-        protected List<string> ExecuteMethods(SourceProductionContext context, GeneratorTransformResult<TypeDeclarationSyntax> node, INamedTypeSymbol targetType)
+        protected List<string> ExecuteMethods(SourceProductionContext context, GeneratorTransformResult<ISymbol> node, INamedTypeSymbol targetType)
         {
             var members = targetType.GetMembers();
             var methods = members.OfType<IMethodSymbol>().Where(x=>x.MethodKind== MethodKind.Ordinary).ToList();

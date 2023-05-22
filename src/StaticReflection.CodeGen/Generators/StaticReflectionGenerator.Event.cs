@@ -7,7 +7,7 @@ namespace StaticReflection.CodeGen.Generators
 {
     public partial class StaticReflectionGenerator
     {
-        protected List<string> ExecuteEvents(SourceProductionContext context, GeneratorTransformResult<TypeDeclarationSyntax> node, INamedTypeSymbol targetType)
+        protected List<string> ExecuteEvents(SourceProductionContext context, GeneratorTransformResult<ISymbol> node, INamedTypeSymbol targetType)
         {
             var members = targetType.GetMembers();
             var ev = members.OfType<IEventSymbol>().ToList();

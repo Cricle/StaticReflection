@@ -8,7 +8,7 @@ namespace StaticReflection.CodeGen.Generators
 {
     public partial class StaticReflectionGenerator
     {
-        protected List<string> ExecuteProperty(SourceProductionContext context, GeneratorTransformResult<TypeDeclarationSyntax> node,INamedTypeSymbol targetType)
+        protected List<string> ExecuteProperty(SourceProductionContext context, GeneratorTransformResult<ISymbol> node,INamedTypeSymbol targetType)
         {
             var members = targetType.GetMembers();
             var properyies = members.OfType<IPropertySymbol>().Where(x => !x.IsIndexer).ToList();
