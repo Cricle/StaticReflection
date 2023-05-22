@@ -6,7 +6,7 @@ using System.Text;
 
 namespace StaticReflection.CodeGen.Generators
 {
-    public partial class PropertyGenerator
+    public partial class StaticReflectionGenerator
     {
         protected void ExecuteProperty(SourceProductionContext context, GeneratorTransformResult<TypeDeclarationSyntax> node,INamedTypeSymbol targetType)
         {

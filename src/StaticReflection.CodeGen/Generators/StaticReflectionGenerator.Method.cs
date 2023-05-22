@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace StaticReflection.CodeGen.Generators
 {
-    public partial class PropertyGenerator
+    public partial class StaticReflectionGenerator
     {
         protected void ExecuteMethods(SourceProductionContext context, GeneratorTransformResult<TypeDeclarationSyntax> node, INamedTypeSymbol targetType)
         {

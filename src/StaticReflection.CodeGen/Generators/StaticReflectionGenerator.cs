@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace StaticReflection.CodeGen.Generators
 {
     [Generator]
-    public partial class PropertyGenerator : IIncrementalGenerator
+    public partial class StaticReflectionGenerator : IIncrementalGenerator
     {
         private IncrementalGeneratorInitializationContext context;
 
