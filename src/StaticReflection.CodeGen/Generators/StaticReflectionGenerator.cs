@@ -23,23 +23,10 @@ namespace StaticReflection.CodeGen.Generators
         protected GeneratorTransformResult<ISymbol?>? Transform(GeneratorAttributeSyntaxContext context, CancellationToken token)
         {
             return new GeneratorTransformResult<ISymbol?>(context.TargetSymbol, context);
-            //var sn = context.SemanticModel;
-            //var typeSymbol = sn.GetSymbolInfo(context.TargetNode, token).Symbol;
-            //if (typeSymbol != null &&
-            //    typeSymbol.GetAttributes().Any(x => x.AttributeClass?.ToString() == StaticReflectionAttributeConsts.Name))
-            //{
-            //    return new GeneratorTransformResult<MemberDeclarationSyntax>((MemberDeclarationSyntax)context.Node, context);
-            //}
-            //return null;
         }
         protected bool Predicate(SyntaxNode node, CancellationToken token)
         {
             return true;
-            //if (node is MemberDeclarationSyntax)
-            //{
-            //    return true;
-            //}
-            //return false;
         }
 
         protected virtual string GetAccessibilityString(Accessibility accessibility)
@@ -91,13 +78,36 @@ namespace StaticReflection.CodeGen.Generators
             var targetType = node.SyntaxContext.TargetSymbol;
             if (node.Value != null)
             {
-                var attribute = targetType.GetAttributes().First(x => x.AttributeClass?.ToString() == StaticReflectionAttributeConsts.Name);
-                targetType = (attribute.NamedArguments.FirstOrDefault(x => x.Key == StaticReflectionAttributeConsts.TypeName).Value.Value as INamedTypeSymbol)?.OriginalDefinition?? targetType;
+                var processingedEmpty = false;
+                var processedType=new HashSet<string>();
+                var attributes = targetType.GetAttributes().Where(x => x.AttributeClass?.ToString() == StaticReflectionAttributeConsts.Name).ToList();
+                foreach (var attr in attributes)
+                {
+                    var attrType = (attr.NamedArguments.FirstOrDefault(x => x.Key == StaticReflectionAttributeConsts.TypeName).Value.Value as INamedTypeSymbol)?.OriginalDefinition;
+                    targetType = attrType ?? targetType;
+
+                    if (attrType != null&& processedType.Add(attrType.ToString()))
+                    {
+                        ExecuteOne(context, node, attr, attrType);
+                    }
+                    else if(!processingedEmpty)
+                    {
+                        processingedEmpty = true;
+                        ExecuteOne(context, node, attr, targetType!);
+                    }
+                }
             }
+        }
+        protected void ExecuteOne(SourceProductionContext context, GeneratorTransformResult<ISymbol> node, AttributeData data, ISymbol targetType)
+        {
             INamedTypeSymbol? nameTypeTarget = targetType as INamedTypeSymbol;
             if (targetType is IPropertySymbol propertySymbol)
             {
                 nameTypeTarget = propertySymbol.Type as INamedTypeSymbol;
+            }
+            else if (targetType is IFieldSymbol fieldSymbol)
+            {
+                nameTypeTarget = fieldSymbol.Type as INamedTypeSymbol;
             }
 
             var properties=ExecuteProperty(context, node, nameTypeTarget);
