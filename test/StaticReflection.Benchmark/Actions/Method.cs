@@ -62,8 +62,13 @@ namespace StaticReflection.Benchmark.Actions
         {
             for (int i = 0; i < LoopCount; i++)
             {
-                StudentGoT0P1MReflection.Instance.Invoke(student,ref i);
+                Proxy(student, i);
             }
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void Proxy(object instance,params object[] pars)
+        {
+            StudentGoT0P1MReflection.Instance.Invoke(Unsafe.As<object,Student>(ref instance),ref Unsafe.Unbox<int>(pars[0]));
         }
     }
 }

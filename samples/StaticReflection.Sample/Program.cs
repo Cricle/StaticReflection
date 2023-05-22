@@ -12,9 +12,10 @@ namespace StaticReflection.Sample
 
         static void Main(string[] args)
         {
-            Console.WriteLine(string.Join(",", AReflection.Instance.Properties.Select(x => $"{x.PropertyType} {x.Name}")));
+            Console.WriteLine(string.Join(",", AReflection.Instance.Properties[0].Attributes.Select(x=>x)));
         }
     }
+
     public class B
     {
         public int S1 { get; set; }
@@ -29,6 +30,6 @@ namespace StaticReflection.Sample
 
         public double Hello { get; set; }
 
-        public double Well { get; set; }
+        public double Well { get; }
     }
 }
