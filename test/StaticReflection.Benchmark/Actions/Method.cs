@@ -19,6 +19,7 @@ namespace StaticReflection.Benchmark.Actions
     public class Method
     {
         private Student student;
+        private object ostudent;
 
         private Action<object,object> expression;
         private MethodInfo methodInfo;
@@ -26,7 +27,7 @@ namespace StaticReflection.Benchmark.Actions
         [GlobalSetup]
         public void Setup()
         {
-            student = new Student();
+            ostudent=student = new Student();
             var par1 = Expression.Parameter(typeof(object));
             var par2 = Expression.Parameter(typeof(object));
             expression = Expression.Lambda<Action<object,object>>(
@@ -42,33 +43,29 @@ namespace StaticReflection.Benchmark.Actions
         public void Raw()
         {
             for (int i = 0; i < LoopCount; i++)
-                student.Go(i);
+                student.Go(1);
         }
         [Benchmark]
         public void ReflectionCall()
         {
             for (int i = 0; i < LoopCount; i++)
-                methodInfo.Invoke(student, new object[] { i });
+                methodInfo.Invoke(student, new object[] { 1 });
         }
         [Benchmark]
         public void ExpressionCall()
         {
             for (int i = 0; i < LoopCount; i++)
-                expression(student,i);
+                expression(student,1);
         }
 
         [Benchmark]
         public void StaticReflection()
         {
+            object obji = 1;
             for (int i = 0; i < LoopCount; i++)
             {
-                Proxy(student, i);
+                StudentGoT0P1MReflection.Instance.InvokeAnonymous(ostudent, ref obji);
             }
-        }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void Proxy(object instance,params object[] pars)
-        {
-            StudentGoT0P1MReflection.Instance.Invoke(Unsafe.As<object,Student>(ref instance),ref Unsafe.Unbox<int>(pars[0]));
         }
     }
 }

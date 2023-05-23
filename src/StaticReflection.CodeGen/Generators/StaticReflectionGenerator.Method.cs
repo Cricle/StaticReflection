@@ -51,7 +51,7 @@ namespace StaticReflection.CodeGen.Generators
                     var hasReturn = !method.ReturnsVoid;
                     implementInvokeInterface = ",";
                     var unsafeScript = @"
-#if NETFRAMEWORK
+#if !NET7_0_OR_GREATER
 unsafe
 #endif
 ";
@@ -59,12 +59,12 @@ unsafe
                     {
                         if (hasReturn)
                         {
-                            implementInvokeInterface += $"StaticReflection.Invoking.IArgsAnyMethod<{targetType},{method.ReturnType}>";
+                            implementInvokeInterface += $"StaticReflection.Invoking.IArgsAnyMethod<{targetType},{method.ReturnType}>,StaticReflection.Invoking.IArgsAnyAnonymousMethod";
                             invokeImplement = $"public {unsafeScript} ref {method.ReturnType} Invoke({targetType} instance, params object[] inputs)";
                         }
                         else
                         {
-                            implementInvokeInterface += $"StaticReflection.Invoking.IVoidArgsAnyMethod<{targetType}>";
+                            implementInvokeInterface += $"StaticReflection.Invoking.IVoidArgsAnyMethod<{targetType}>,StaticReflection.Invoking.IVoidArgsAnyAnonymousMethod";
                             invokeImplement = $"public {unsafeScript} void Invoke({targetType} instance, params object[] inputs)";
                         }
                     }
@@ -72,12 +72,12 @@ unsafe
                     {
                         if (hasReturn)
                         {
-                            implementInvokeInterface += $"StaticReflection.Invoking.IArgsMethod<{targetType},{method.ReturnType}>";
+                            implementInvokeInterface += $"StaticReflection.Invoking.IArgsMethod<{targetType},{method.ReturnType}>,StaticReflection.Invoking.IArgs{method.Parameters.Length}AnonymousMethod";
                             invokeImplement = $"public {unsafeScript} ref {method.ReturnType} Invoke({targetType} instance)";
                         }
                         else
                         {
-                            implementInvokeInterface += $"StaticReflection.Invoking.IVoidArgsMethod<{targetType}>";
+                            implementInvokeInterface += $"StaticReflection.Invoking.IVoidArgsMethod<{targetType}>,StaticReflection.Invoking.IVoidArgs{method.Parameters.Length}AnonymousMethod";
                             invokeImplement = $"public {unsafeScript} void Invoke({targetType} instance)";
                         }
                     }
@@ -95,6 +95,14 @@ unsafe
                             invokeImplement = $"public {unsafeScript} void Invoke({targetType} instance,{args})";
                         }
                         implementInvokeInterface += string.Join(",", method.Parameters.Select(x=>x.Type)) + ">";
+                        if (hasReturn)
+                        {
+                            implementInvokeInterface += $",StaticReflection.Invoking.IArgs{method.Parameters.Length}AnonymousMethod";
+                        }
+                        else
+                        {
+                            implementInvokeInterface += $",StaticReflection.Invoking.IVoidArgs{method.Parameters.Length}AnonymousMethod";
+                        }
                     }
                     invokeImplement += "\n{\n";
 
@@ -121,6 +129,57 @@ return ref result;
                     }
                     invokeImplement += initCodes;
                     invokeImplement += $"\n{call}\n}}\n";
+                    var asInstance = $"({targetType})instance";
+                    if (argOutof16)
+                    {
+                        if (hasReturn)
+                        {
+                            invokeImplement += $@"
+public {unsafeScript} ref object InvokeAnonymous(object instance, params object[] inputs)
+{{
+    return ref System.Runtime.CompilerServices.Unsafe.AsRef<object>(Invoke({asInstance},inputs));
+}}
+";
+                        }
+                        else
+                        {
+                            invokeImplement += $@"
+public void InvokeAnonymous(object instance, params object[] inputs)
+{{
+    Invoke({asInstance},inputs);
+}}
+";
+                        }
+                    }
+                    else
+                    {
+                        var argStr = string.Join(",", Enumerable.Range(0, method.Parameters.Length).Select(x => $"ref object arg{x}"));
+                        var parStr = string.Join(",", Enumerable.Range(0, method.Parameters.Length)
+                            .Select(x => $"ref System.Runtime.CompilerServices.Unsafe.As<object,{method.Parameters[x].Type}>(ref arg{x})"));
+                        if (method.Parameters.Length!=0)
+                        {
+                            argStr = "," + argStr;
+                            parStr = "," + parStr;
+                        }
+                        if (hasReturn)
+                        {
+                            invokeImplement += $@"
+public {unsafeScript} ref object InvokeAnonymous(object instance{argStr})
+{{
+    return ref System.Runtime.CompilerServices.Unsafe.AsRef<object>(Invoke({asInstance}{parStr}));
+}}
+";
+                        }
+                        else
+                        {
+                            invokeImplement += $@"
+public void InvokeAnonymous(object instance{argStr})
+{{
+    Invoke({asInstance}{parStr});
+}}
+";
+                        }
+                    }
                 }
 
                 string CompileArg(string inputType,string inputArg,IParameterSymbol symbol,StringBuilder initCodes)
