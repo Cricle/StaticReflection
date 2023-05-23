@@ -155,7 +155,15 @@ public void InvokeAnonymous(object instance, params object[] inputs)
                     {
                         var argStr = string.Join(",", Enumerable.Range(0, method.Parameters.Length).Select(x => $"ref object arg{x}"));
                         var parStr = string.Join(",", Enumerable.Range(0, method.Parameters.Length)
-                            .Select(x => $"ref System.Runtime.CompilerServices.Unsafe.As<object,{method.Parameters[x].Type}>(ref arg{x})"));
+                            .Select(x =>
+                            {
+                                var par = method.Parameters[x];
+                                if (par.Type.IsValueType)
+                                {
+                                    return $"ref System.Runtime.CompilerServices.Unsafe.Unbox<{par.Type}>(arg{x})";
+                                }
+                                return $"ref System.Runtime.CompilerServices.Unsafe.As<object,{par.Type}>(ref arg{x})";
+                            }));
                         if (method.Parameters.Length!=0)
                         {
                             argStr = "," + argStr;
@@ -184,21 +192,27 @@ public void InvokeAnonymous(object instance{argStr})
 
                 string CompileArg(string inputType,string inputArg,IParameterSymbol symbol,StringBuilder initCodes)
                 {
+                    var method = $"As<{inputType},{symbol.Type}>(ref ";
+                    if (symbol.Type.IsValueType)
+                    {
+                        method = $"Unbox<{symbol.Type}>(";
+                    }
+
                     if (symbol.RefKind== RefKind.None)
                     {
-                        return $"System.Runtime.CompilerServices.Unsafe.As<{inputType},{symbol.Type}>(ref {inputArg})";
+                        return $"System.Runtime.CompilerServices.Unsafe.{method}{inputArg})";
                     }
                     else if (symbol.RefKind== RefKind.Ref)
                     {
-                        return $"ref System.Runtime.CompilerServices.Unsafe.As<{inputType},{symbol.Type}>(ref {inputArg})";
+                        return $"ref System.Runtime.CompilerServices.Unsafe.{method}{inputArg})";
                     }
                     else if (symbol.RefKind== RefKind.RefReadOnly)
                     {
-                        return $"ref System.Runtime.CompilerServices.Unsafe.As<{inputType},{symbol.Type}>(ref {inputArg})";
+                        return $"ref System.Runtime.CompilerServices.Unsafe.{method}{inputArg})";
                     }
                     else if (symbol.RefKind== RefKind.In)
                     {
-                        return $"in System.Runtime.CompilerServices.Unsafe.As<{inputType},{symbol.Type}>(ref {inputArg})";
+                        return $"in System.Runtime.CompilerServices.Unsafe.{method}{inputArg})";
                     }
                     else if (symbol.RefKind == RefKind.Out)
                     {
