@@ -61,7 +61,7 @@ namespace StaticReflection.CodeGen.Generators
                 var str = $@"
     [System.Diagnostics.DebuggerStepThrough]
     [System.Runtime.CompilerServices.CompilerGenerated]
-    {visibility} sealed class {ssr}:IPropertyInvokeDefine<{targetType},{property.Type}>,IPropertyDefine
+    {visibility} sealed class {ssr}:StaticReflection.IPropertyInvokeDefine<{targetType},{property.Type}>,StaticReflection.IPropertyDefine,StaticReflection.IPropertyAnonymousInvokeDefine
     {{
         public static readonly {ssr} Instance = new {ssr}();
 
@@ -126,6 +126,16 @@ namespace StaticReflection.CodeGen.Generators
         public void SetValue({name} instance,{property.Type} value)
         {{
             {setBody}
+        }}
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public void SetValueAnonymous(object instance, object value)
+        {{
+            SetValue(({targetType})instance,({property.Type})value);
+        }}
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public object GetValueAnonymous(object instance)
+        {{
+            return ({property.Type})GetValue(({targetType})instance);
         }}
     }}
 ";

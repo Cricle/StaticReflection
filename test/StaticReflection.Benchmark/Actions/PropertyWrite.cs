@@ -4,13 +4,12 @@ using System.Reflection;
 
 namespace StaticReflection.Benchmark.Actions
 {
-
     [MemoryDiagnoser]
-    public class Property
+    public class PropertyWrite
     {
         private Student student;
 
-        private Func<object, object> expression;
+        private Action<object, object> expression;
         private PropertyInfo propertyInfo;
 
         [GlobalSetup]
@@ -18,11 +17,12 @@ namespace StaticReflection.Benchmark.Actions
         {
             student = new Student();
             var par1 = Expression.Parameter(typeof(object));
-            expression = Expression.Lambda<Func<object, object>>(
-                Expression.Convert(
-                    Expression.Call(
-                        Expression.Convert(par1, typeof(Student)), typeof(Student).GetProperty(nameof(Student.Name)).GetMethod), typeof(object)), par1).Compile();
-            propertyInfo = typeof(Student).GetProperty(nameof(Student.Name));
+            var par2 = Expression.Parameter(typeof(object));
+            expression = Expression.Lambda<Action<object, object>>(
+                Expression.Call(
+                        Expression.Convert(par1, typeof(Student)), typeof(Student).GetProperty(nameof(Student.Id)).SetMethod,
+                        Expression.Convert(par2, typeof(int))), par1, par2).Compile();
+            propertyInfo = typeof(Student).GetProperty(nameof(Student.Id));
         }
 
         [Params(5012)]
@@ -32,27 +32,27 @@ namespace StaticReflection.Benchmark.Actions
         public void Raw()
         {
             for (int i = 0; i < LoopCount; i++)
-                _ = student.Id;
+                student.Id = i;
         }
         [Benchmark]
         public void ReflectionCall()
         {
             for (int i = 0; i < LoopCount; i++)
-                _ = propertyInfo.GetValue(student);
+                propertyInfo.SetValue(student,i);
         }
         [Benchmark]
         public void ExpressionCall()
         {
             for (int i = 0; i < LoopCount; i++)
-                _ = expression(student);
+                expression(student,i);
         }
         [Benchmark]
-        
+
         public void StaticReflection()
         {
             for (int i = 0; i < LoopCount; i++)
             {
-                _ = StudentIdPReflection.Instance.GetValue(student);
+                StudentIdPReflection.Instance.SetValueAnonymous(student,i);
             }
         }
     }
