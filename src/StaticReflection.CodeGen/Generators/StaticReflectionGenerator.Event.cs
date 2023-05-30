@@ -38,7 +38,7 @@ namespace StaticReflection.CodeGen.Generators
                 var str = $@"
     [System.Diagnostics.DebuggerStepThrough]
     [System.Runtime.CompilerServices.CompilerGenerated]
-    {visibility} sealed class {ssr}:IEventDefine
+    {visibility} sealed class {ssr}:StaticReflection.EventTransfer, StaticReflection.IEventDefine
     {{
         public static readonly {ssr} Instance = new {ssr}();
 
@@ -91,7 +91,6 @@ namespace StaticReflection.CodeGen.Generators
         public System.Collections.Generic.IReadOnlyList<System.Attribute> Attributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", attributeStrs)} }};
 
         public System.Collections.Generic.IReadOnlyList<System.Type> ArgumentTypes {{ get; }} = new System.Type[] {{ {string.Join(",", delegateInvokeMethod.Parameters.Select(x=>$"typeof({x.Type.ToString().TrimEnd('?')})"))} }};
-
     }}";
                 scriptBuilder.AppendLine(str);
             }
