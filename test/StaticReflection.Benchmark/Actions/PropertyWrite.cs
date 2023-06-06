@@ -52,7 +52,7 @@ namespace StaticReflection.Benchmark.Actions
         {
             for (int i = 0; i < LoopCount; i++)
             {
-                StudentIdPReflection.Instance.SetValueAnonymous(student,i);
+                StudentReflection.StudentIdPReflection.Instance.SetValueAnonymous(student,i);
             }
         }
     }

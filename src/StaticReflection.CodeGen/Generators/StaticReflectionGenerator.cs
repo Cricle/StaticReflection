@@ -1,9 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Diagnostics;
-using System.Dynamic;
-using System.Xml.Linq;
+using System.Text;
 
 namespace StaticReflection.CodeGen.Generators
 {
@@ -85,19 +83,22 @@ namespace StaticReflection.CodeGen.Generators
                 {
                     var attrType = (attr.NamedArguments.FirstOrDefault(x => x.Key == StaticReflectionAttributeConsts.TypeName).Value.Value as INamedTypeSymbol)?.OriginalDefinition;
                     targetType = attrType ?? targetType;
-
+                    var newNode = new GeneratorTransformResult<ISymbol>(targetType, node.SyntaxContext);
                     if (attrType != null&& processedType.Add(attrType.ToString()))
                     {
-                        ExecuteOne(context, node, attr, attrType);
+                        ExecuteOne(context, newNode, attr, attrType);
                     }
                     else if(!processingedEmpty)
                     {
                         processingedEmpty = true;
-                        ExecuteOne(context, node, attr, targetType!);
+                        ExecuteOne(context, newNode, attr, targetType!);
                     }
                 }
             }
         }
+
+        private StringBuilder sourceScript = new StringBuilder();
+
         protected void ExecuteOne(SourceProductionContext context, GeneratorTransformResult<ISymbol> node, AttributeData data, ISymbol targetType)
         {
             INamedTypeSymbol? nameTypeTarget = targetType as INamedTypeSymbol;
@@ -121,10 +122,13 @@ namespace StaticReflection.CodeGen.Generators
             var attributeStrs = GetAttributeStrings(targetType.GetAttributes());
 
             var str = $@"
+#pragma warning disable CS9082
 namespace {nameSpace}
 {{
     {visibility} sealed class {ssr} : ITypeDefine
     {{
+        {sourceScript}
+        
         public static readonly {ssr} Instance = new {ssr}();
 
         public System.Type DeclareType {{ get; }} = typeof({nameTypeTarget});
@@ -168,8 +172,10 @@ namespace {nameSpace}
         public System.Collections.Generic.IReadOnlyList<StaticReflection.IEventDefine> Events {{ get; }} = new StaticReflection.IEventDefine[]{{ {string.Join(",", events.Select(x => $"{x}.Instance"))} }};
     }}
 }}
-"; 
-            context.AddSource($"{nameTypeTarget.Name}{"Reflection"}.g.cs", str);
+";
+            var code = FormatCode(str);
+            context.AddSource($"{nameTypeTarget.Name}{"Reflection"}.g.cs", code);
+            sourceScript = new StringBuilder();
 
         }
 

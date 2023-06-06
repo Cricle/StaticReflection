@@ -22,8 +22,6 @@ namespace StaticReflection.CodeGen.Generators
             var name = targetType.ToString().Split('.').Last();
 
             var scriptBuilder = new StringBuilder();
-            scriptBuilder.AppendLine($"namespace {nameSpace}");
-            scriptBuilder.AppendLine("{");
 
             var types = new List<string>();
 
@@ -95,11 +93,9 @@ namespace StaticReflection.CodeGen.Generators
                 scriptBuilder.AppendLine(str);
             }
             scriptBuilder.AppendLine();
-            scriptBuilder.AppendLine("}");
 
             var code = FormatCode(scriptBuilder.ToString());
-            context.AddSource($"{name}{"EventsReflection"}.g.cs", code);
-
+            sourceScript.AppendLine(code);
             return types;
         }
     }

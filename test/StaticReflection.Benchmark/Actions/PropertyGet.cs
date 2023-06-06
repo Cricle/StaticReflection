@@ -51,7 +51,7 @@ namespace StaticReflection.Benchmark.Actions
         {
             for (int i = 0; i < LoopCount; i++)
             {
-                _ = StudentIdPReflection.Instance.GetValueAnonymous(student);
+                _ = StudentReflection.StudentIdPReflection.Instance.GetValueAnonymous(student);
             }
         }
     }

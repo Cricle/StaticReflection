@@ -66,75 +66,75 @@
     }
     public interface IVoidArgsAnyMethod<TInstance>
     {
-        void Invoke(TInstance instance, params object[] inputs);
+        void Invoke(TInstance instance, params object?[] inputs);
     }
 
     public interface IVoidArgs0AnonymousMethod
     {
-        void InvokeAnonymous(object instance);
+        void InvokeAnonymous(object? instance);
     }
     public interface IVoidArgs1AnonymousMethod
     {
-        void InvokeAnonymous(object instance, ref object arg0);
+        void InvokeAnonymous(object? instance, ref object?  arg0);
     }
     public interface IVoidArgs2AnonymousMethod
     {
-        void InvokeAnonymous(object instance, ref object arg0, ref object arg1);
+        void InvokeAnonymous(object? instance, ref object?  arg0, ref object?  arg1);
     }
     public interface IVoidArgs3AnonymousMethod
     {
-        void InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2);
+        void InvokeAnonymous(object? instance, ref object?  arg0, ref object?  arg1, ref object?  arg2);
     }
     public interface IVoidArgs4AnonymousMethod
     {
-        void InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3);
+        void InvokeAnonymous(object? instance, ref object?  arg0, ref object?  arg1, ref object?  arg2, ref object?  arg3);
     }
     public interface IVoidArgs5AnonymousMethod
     {
-        void InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4);
+        void InvokeAnonymous(object? instance, ref object?  arg0, ref object?  arg1, ref object?  arg2, ref object?  arg3, ref object?  arg4);
     }
     public interface IVoidArgs6AnonymousMethod
     {
-        void InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4, ref object arg5);
+        void InvokeAnonymous(object? instance, ref object?  arg0, ref object?  arg1, ref object?  arg2, ref object?  arg3, ref object?  arg4, ref object?  arg5);
     }
     public interface IVoidArgs7AnonymousMethod
     {
-        void InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4, ref object arg5, ref object arg6);
+        void InvokeAnonymous(object? instance, ref object?  arg0, ref object?  arg1, ref object?  arg2, ref object?  arg3, ref object?  arg4, ref object?  arg5, ref object?  arg6);
     }
     public interface IVoidArgs8AnonymousMethod
     {
-        void InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4, ref object arg5, ref object arg6, ref object arg7);
+        void InvokeAnonymous(object? instance, ref object?  arg0, ref object?  arg1, ref object?  arg2, ref object?  arg3, ref object?  arg4, ref object?  arg5, ref object?  arg6, ref object?  arg7);
     }
     public interface IVoidArgs9AnonymousMethod
     {
-        void InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4, ref object arg5, ref object arg6, ref object arg7, ref object arg8);
+        void InvokeAnonymous(object? instance, ref object?  arg0, ref object?  arg1, ref object?  arg2, ref object?  arg3, ref object?  arg4, ref object?  arg5, ref object?  arg6, ref object?  arg7, ref object?  arg8);
     }
     public interface IVoidArgs10AnonymousMethod
     {
-        void InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4, ref object arg5, ref object arg6, ref object arg7, ref object arg8, ref object arg9);
+        void InvokeAnonymous(object? instance, ref object?  arg0, ref object?  arg1, ref object?  arg2, ref object?  arg3, ref object?  arg4, ref object?  arg5, ref object?  arg6, ref object?  arg7, ref object?  arg8, ref object?  arg9);
     }
     public interface IVoidArgs11AnonymousMethod
     {
-        void InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4, ref object arg5, ref object arg6, ref object arg7, ref object arg8, ref object arg9, ref object arg10);
+        void InvokeAnonymous(object? instance, ref object?  arg0, ref object?  arg1, ref object?  arg2, ref object?  arg3, ref object?  arg4, ref object?  arg5, ref object?  arg6, ref object?  arg7, ref object?  arg8, ref object?  arg9, ref object?  arg10);
     }
     public interface IVoidArgs12AnonymousMethod
     {
-        void InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4, ref object arg5, ref object arg6, ref object arg7, ref object arg8, ref object arg9, ref object arg10, ref object arg11);
+        void InvokeAnonymous(object? instance, ref object?  arg0, ref object?  arg1, ref object?  arg2, ref object?  arg3, ref object?  arg4, ref object?  arg5, ref object?  arg6, ref object?  arg7, ref object?  arg8, ref object?  arg9, ref object?  arg10, ref object?  arg11);
     }
     public interface IVoidArgs13AnonymousMethod
     {
-        void InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4, ref object arg5, ref object arg6, ref object arg7, ref object arg8, ref object arg9, ref object arg10, ref object arg11, ref object arg12);
+        void InvokeAnonymous(object? instance, ref object?  arg0, ref object?  arg1, ref object?  arg2, ref object?  arg3, ref object?  arg4, ref object?  arg5, ref object?  arg6, ref object?  arg7, ref object?  arg8, ref object?  arg9, ref object?  arg10, ref object?  arg11, ref object?  arg12);
     }
     public interface IVoidArgs14AnonymousMethod
     {
-        void InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4, ref object arg5, ref object arg6, ref object arg7, ref object arg8, ref object arg9, ref object arg10, ref object arg11, ref object arg12, ref object arg13);
+        void InvokeAnonymous(object? instance, ref object?  arg0, ref object?  arg1, ref object?  arg2, ref object?  arg3, ref object?  arg4, ref object?  arg5, ref object?  arg6, ref object?  arg7, ref object?  arg8, ref object?  arg9, ref object?  arg10, ref object?  arg11, ref object?  arg12, ref object?  arg13);
     }
     public interface IVoidArgs15AnonymousMethod
     {
-        void InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4, ref object arg5, ref object arg6, ref object arg7, ref object arg8, ref object arg9, ref object arg10, ref object arg11, ref object arg12, ref object arg13, ref object arg14);
+        void InvokeAnonymous(object? instance, ref object?  arg0, ref object?  arg1, ref object?  arg2, ref object?  arg3, ref object?  arg4, ref object?  arg5, ref object?  arg6, ref object?  arg7, ref object?  arg8, ref object?  arg9, ref object?  arg10, ref object?  arg11, ref object?  arg12, ref object?  arg13, ref object?  arg14);
     }
     public interface IVoidArgsAnyAnonymousMethod
     {
-        void InvokeAnonymous(object instance, params object[] inputs);
+        void InvokeAnonymous(object? instance, params object?[] inputs);
     }
 }

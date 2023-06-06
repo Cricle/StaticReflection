@@ -21,9 +21,7 @@ namespace StaticReflection.CodeGen.Generators
             var nameSpace = targetType.ContainingNamespace.ToString();
             var name = targetType.ToString().Split('.').Last();
 
-            var scriptBuilder = new StringBuilder($"namespace {nameSpace}");
-            scriptBuilder.AppendLine();
-            scriptBuilder.AppendLine("{");
+            var scriptBuilder = new StringBuilder();
 
             var types = new List<string>();
 
@@ -32,7 +30,7 @@ namespace StaticReflection.CodeGen.Generators
                 var ssr = name + property.Name + "PReflection";
                 var attributeStrs = GetAttributeStrings(property.GetAttributes());
                 var getBody = $"throw new System.InvalidOperationException(\"The property {targetType}.{property} is set only\");";
-                if (!property.IsWriteOnly)
+                if (!property.IsWriteOnly|| property.IsReadOnly)
                 {
                     if (property.IsStatic)
                     {
@@ -142,8 +140,7 @@ namespace StaticReflection.CodeGen.Generators
                 scriptBuilder.AppendLine(str);
             }
             scriptBuilder.AppendLine();
-            scriptBuilder.AppendLine("}");
-            context.AddSource($"{name}{"PropertiesReflection"}.g.cs", scriptBuilder.ToString());
+            sourceScript.AppendLine(scriptBuilder.ToString());
             return types;
         }
     }

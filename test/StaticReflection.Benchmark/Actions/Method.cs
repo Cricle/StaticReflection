@@ -64,7 +64,7 @@ namespace StaticReflection.Benchmark.Actions
             object obji = 1;
             for (int i = 0; i < LoopCount; i++)
             {
-                StudentGoT0P1MReflection.Instance.InvokeAnonymous(ostudent, ref obji);
+                StudentReflection.StudentGoT0P1MReflection.Instance.InvokeAnonymous(ostudent, ref obji);
             }
         }
     }

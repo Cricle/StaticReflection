@@ -71,70 +71,70 @@
 
     public interface IArgs0AnonymousMethod
     {
-        ref object InvokeAnonymous(object instance);
+        ref object? InvokeAnonymous(object? instance);
     }
     public interface IArgs1AnonymousMethod
     {
-        ref object InvokeAnonymous(object instance, ref object arg0);
+        ref object? InvokeAnonymous(object? instance, ref object? arg0);
     }
     public interface IArgs2AnonymousMethod
     {
-        ref object InvokeAnonymous(object instance, ref object arg0, ref object arg1);
+        ref object? InvokeAnonymous(object? instance, ref object? arg0, ref object? arg1);
     }
     public interface IArgs3AnonymousMethod
     {
-        ref object InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2);
+        ref object? InvokeAnonymous(object? instance, ref object? arg0, ref object? arg1, ref object? arg2);
     }
     public interface IArgs4AnonymousMethod
     {
-        ref object InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3);
+        ref object? InvokeAnonymous(object? instance, ref object? arg0, ref object? arg1, ref object? arg2, ref object? arg3);
     }
     public interface IArgs5AnonymousMethod
     {
-        ref object InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4);
+        ref object? InvokeAnonymous(object? instance, ref object? arg0, ref object? arg1, ref object? arg2, ref object? arg3, ref object? arg4);
     }
     public interface IArgs6AnonymousMethod
     {
-        ref object InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4, ref object arg5);
+        ref object? InvokeAnonymous(object? instance, ref object? arg0, ref object? arg1, ref object? arg2, ref object? arg3, ref object? arg4, ref object? arg5);
     }
     public interface IArgs7AnonymousMethod
     {
-        ref object InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4, ref object arg5, ref object arg6);
+        ref object? InvokeAnonymous(object? instance, ref object? arg0, ref object? arg1, ref object? arg2, ref object? arg3, ref object? arg4, ref object? arg5, ref object? arg6);
     }
     public interface IArgs8AnonymousMethod
     {
-        ref object InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4, ref object arg5, ref object arg6, ref object arg7);
+        ref object? InvokeAnonymous(object? instance, ref object? arg0, ref object? arg1, ref object? arg2, ref object? arg3, ref object? arg4, ref object? arg5, ref object? arg6, ref object? arg7);
     }
     public interface IArgs9AnonymousMethod
     {
-        ref object InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4, ref object arg5, ref object arg6, ref object arg7, ref object arg8);
+        ref object? InvokeAnonymous(object? instance, ref object? arg0, ref object? arg1, ref object? arg2, ref object? arg3, ref object? arg4, ref object? arg5, ref object? arg6, ref object? arg7, ref object? arg8);
     }
     public interface IArgs10AnonymousMethod
     {
-        ref object InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4, ref object arg5, ref object arg6, ref object arg7, ref object arg8, ref object arg9);
+        ref object? InvokeAnonymous(object? instance, ref object? arg0, ref object? arg1, ref object? arg2, ref object? arg3, ref object? arg4, ref object? arg5, ref object? arg6, ref object? arg7, ref object? arg8, ref object? arg9);
     }
     public interface IArgs11AnonymousMethod
     {
-        ref object InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4, ref object arg5, ref object arg6, ref object arg7, ref object arg8, ref object arg9, ref object arg10);
+        ref object? InvokeAnonymous(object? instance, ref object? arg0, ref object? arg1, ref object? arg2, ref object? arg3, ref object? arg4, ref object? arg5, ref object? arg6, ref object? arg7, ref object? arg8, ref object? arg9, ref object? arg10);
     }
     public interface IArgs12AnonymousMethod
     {
-        ref object InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4, ref object arg5, ref object arg6, ref object arg7, ref object arg8, ref object arg9, ref object arg10, ref object arg11);
+        ref object? InvokeAnonymous(object? instance, ref object? arg0, ref object? arg1, ref object? arg2, ref object? arg3, ref object? arg4, ref object? arg5, ref object? arg6, ref object? arg7, ref object? arg8, ref object? arg9, ref object? arg10, ref object? arg11);
     }
     public interface IArgs13AnonymousMethod
     {
-        ref object InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4, ref object arg5, ref object arg6, ref object arg7, ref object arg8, ref object arg9, ref object arg10, ref object arg11, ref object arg12);
+        ref object? InvokeAnonymous(object? instance, ref object? arg0, ref object? arg1, ref object? arg2, ref object? arg3, ref object? arg4, ref object? arg5, ref object? arg6, ref object? arg7, ref object? arg8, ref object? arg9, ref object? arg10, ref object? arg11, ref object? arg12);
     }
     public interface IArgs14AnonymousMethod
     {
-        ref object InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4, ref object arg5, ref object arg6, ref object arg7, ref object arg8, ref object arg9, ref object arg10, ref object arg11, ref object arg12, ref object arg13);
+        ref object? InvokeAnonymous(object? instance, ref object? arg0, ref object? arg1, ref object? arg2, ref object? arg3, ref object? arg4, ref object? arg5, ref object? arg6, ref object? arg7, ref object? arg8, ref object? arg9, ref object? arg10, ref object? arg11, ref object? arg12, ref object? arg13);
     }
     public interface IArgs15AnonymousMethod
     {
-        ref object InvokeAnonymous(object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4, ref object arg5, ref object arg6, ref object arg7, ref object arg8, ref object arg9, ref object arg10, ref object arg11, ref object arg12, ref object arg13, ref object arg14);
+        ref object? InvokeAnonymous(object? instance, ref object? arg0, ref object? arg1, ref object? arg2, ref object? arg3, ref object? arg4, ref object? arg5, ref object? arg6, ref object? arg7, ref object? arg8, ref object? arg9, ref object? arg10, ref object? arg11, ref object? arg12, ref object? arg13, ref object? arg14);
     }
     public interface IArgsAnyAnonymousMethod
     {
-        ref object InvokeAnonymous(object instance, params object[] inputs);
+        ref object? InvokeAnonymous(object? instance, params object?[] inputs);
     }
 }

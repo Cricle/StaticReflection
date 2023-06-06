@@ -21,9 +21,6 @@ namespace StaticReflection.CodeGen.Generators
             var name = targetType.ToString().Split('.').Last();
 
             var scriptBuilder = new StringBuilder();
-            scriptBuilder.AppendLine("#pragma warning disable CS9082");
-            scriptBuilder.AppendLine($"namespace {nameSpace}");
-            scriptBuilder.AppendLine("{");
 
             var types = new List<string>();
 
@@ -115,11 +112,16 @@ unsafe
                         var line = CompileArg(par.Type.ToString(), "arg" + i, par, initCodes);
                         bodyCodes.Add(line);
                     }
-                    var call = $"instance.{method.Name}({string.Join(",",bodyCodes)})";
+                    var bodyCode = string.Join(",", bodyCodes);
+                    var call = $"instance.{method.Name}({bodyCode})";
+                    if (method.IsStatic)
+                    {
+                        call = $"{targetType.Name}.{method.Name}({bodyCode})";
+                    }
                     if (hasReturn)
                     {
                         call = $@"
-ref {method.ReturnType} result =ref System.Runtime.CompilerServices.Unsafe.AsRef({call});
+ref {method.ReturnType} result = ref System.Runtime.CompilerServices.Unsafe.AsRef({call});
 return ref result;
 ";
                     }
@@ -310,11 +312,9 @@ public void InvokeAnonymous(object instance{argStr})
             }
 
             scriptBuilder.AppendLine();
-            scriptBuilder.AppendLine("}");
 
             var code = FormatCode(scriptBuilder.ToString());
-            context.AddSource($"{name}{"MethodsReflection"}.g.cs", code);
-
+            sourceScript.AppendLine(code);
             return types;
         }
     }

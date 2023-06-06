@@ -2,9 +2,9 @@
 {
     public interface IPropertyAnonymousInvokeDefine
     {
-        void SetValueAnonymous(object instance, object value);
+        void SetValueAnonymous(object? instance, object? value);
 
-        object GetValueAnonymous(object instance);
+        object GetValueAnonymous(object? instance);
     }
     public interface IPropertyInvokeDefine<TInstance, TResult>
     {
