@@ -27,6 +27,12 @@ namespace StaticReflection.CodeGen.Generators
 
             foreach (var property in properyies)
             {
+                var hasAutoGenAttr = property.GetAttributes()
+                    .Any(x => x.AttributeClass?.ToString() == typeof(GeneratorAttribute).FullName);
+                if (hasAutoGenAttr)
+                {
+                    continue;
+                }
                 var ssr = name + property.Name + "PReflection";
                 var attributeStrs = GetAttributeStrings(property.GetAttributes());
                 var getBody = $"throw new System.InvalidOperationException(\"The property {targetType}.{property} is set only\");";

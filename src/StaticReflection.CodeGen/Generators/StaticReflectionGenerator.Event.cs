@@ -89,6 +89,22 @@ namespace StaticReflection.CodeGen.Generators
         public System.Collections.Generic.IReadOnlyList<System.Attribute> Attributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", attributeStrs)} }};
 
         public System.Collections.Generic.IReadOnlyList<System.Type> ArgumentTypes {{ get; }} = new System.Type[] {{ {string.Join(",", delegateInvokeMethod.Parameters.Select(x=>$"typeof({x.Type.ToString().TrimEnd('?')})"))} }};
+
+        protected override void OnStart(object instance)
+        {{
+            (({targetType})instance).{@event.Name}+=OnEventRaise;
+        }}
+        protected override void OnStop(object instance)
+        {{
+            (({targetType})instance).{@event.Name}-=OnEventRaise;
+        }}
+        private void OnEventRaise({string.Join(",", delegateInvokeMethod.Parameters.Select(x=>$"{x.Type} {x.Name}"))})
+        {{
+            OnEventTransfed(new StaticReflection.EventTransferEventArgs(new System.Object[]
+            {{
+                {string.Join(",", delegateInvokeMethod.Parameters.Select(x=>x.Name))}
+            }}));
+        }}
     }}";
                 scriptBuilder.AppendLine(str);
             }

@@ -110,7 +110,10 @@ namespace StaticReflection.CodeGen.Generators
             {
                 nameTypeTarget = fieldSymbol.Type as INamedTypeSymbol;
             }
-
+            if (nameTypeTarget == null)
+            {
+                throw new NotSupportedException(targetType.GetType()?.FullName);
+            }
             var properties=ExecuteProperty(context, node, nameTypeTarget);
             var methods = ExecuteMethods(context, node, nameTypeTarget);
             var events = ExecuteEvents(context, node, nameTypeTarget);

@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis;
 using System.Text;
 using System.Diagnostics;
+using System.Security.Cryptography;
 
 namespace StaticReflection.CodeGen.Generators
 {
@@ -10,7 +11,9 @@ namespace StaticReflection.CodeGen.Generators
         protected List<string> ExecuteMethods(SourceProductionContext context, GeneratorTransformResult<ISymbol> node, INamedTypeSymbol targetType)
         {
             var members = targetType.GetMembers();
-            var methods = members.OfType<IMethodSymbol>().Where(x=>x.MethodKind== MethodKind.Ordinary).ToList();
+            var methods = members.OfType<IMethodSymbol>()
+                .Where(x => x.MethodKind == MethodKind.Ordinary&&!x.IsGenericMethod&&(x.DeclaredAccessibility== Accessibility.Public|| x.DeclaredAccessibility == Accessibility.Internal||x.DeclaredAccessibility== Accessibility.ProtectedAndInternal) && (!x.Name.StartsWith("<") || !x.Name.EndsWith("$")))
+                .ToList();
             if (methods.Count==0)
             {
                 return new List<string>(0);
@@ -23,10 +26,11 @@ namespace StaticReflection.CodeGen.Generators
             var scriptBuilder = new StringBuilder();
 
             var types = new List<string>();
-
+            var index = 0;
             foreach (var method in methods)
             {
-                var ssr = name + method.Name + "T" + method.TypeParameters.Length + "P" + method.Parameters.Length + "MReflection";
+                var ssr = name + method.Name + "T" + method.TypeParameters.Length + "P" + index + "MReflection";
+                index++;
                 var attributeStrs = GetAttributeStrings(method.GetAttributes());
 
                 var typePars = new List<string>();

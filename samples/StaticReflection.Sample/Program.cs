@@ -1,5 +1,6 @@
 ﻿using StaticReflection.Annotions;
 using System.Diagnostics;
+using System.ComponentModel;
 
 namespace StaticReflection.Sample
 {
@@ -11,12 +12,22 @@ namespace StaticReflection.Sample
 
         static void Main(string[] args)
         {
-            AReflection.Instance.InvokeMethod("Ax", null);
-            Console.WriteLine(string.Join(",", AReflection.Instance.Properties[0].Attributes.Select(x=>x)));
+            var a=new A();
+            ABxEReflection.Instance.Start(a);
+            ABxEReflection.Instance.EventTransfed += Instance_EventTransfed;
+            a.Raise(new B {  S=22});
+        }
+
+        private static void Instance_EventTransfed(object? sender, EventTransferEventArgs e)
+        {
+            foreach (var item in e.Args)
+            {
+                Console.WriteLine(item);
+            }
         }
     }
 
-    public class B
+    public record class B
     {
         public int S { get; set; }
 
@@ -26,17 +37,14 @@ namespace StaticReflection.Sample
     }
     public class A
     {
+        [DefaultValue(12)]
         public int S { get; set; }
 
-        public double Hello { get; set; }
+        public event EventHandler<B> Bx;
 
-        public double Well { get; }
-
-        public static int TT { get; set; }
-
-        public static void Ax()
+        public void Raise(B b)
         {
-            Console.WriteLine("Ax");
+            Bx?.Invoke(this, b);
         }
     }
 }

@@ -26,7 +26,7 @@
             }
         }
 
-        public bool Start()
+        public bool Start(object instance)
         {
             if (Interlocked.CompareExchange(ref isListening, 1, 0) == 1)
             {
@@ -35,8 +35,8 @@
             }
             return false;
         }
-        protected abstract void OnStart();
-        public bool Stop()
+        protected abstract void OnStart(object instance);
+        public bool Stop(object instance)
         {
             if (Interlocked.CompareExchange(ref isListening, 0, 1) == 0)
             {
@@ -45,7 +45,7 @@
             }
             return false;
         }
-        protected abstract void OnStop();
+        protected abstract void OnStop(object instance);
 
         public void OnEventTransfed(EventTransferEventArgs args)
         {

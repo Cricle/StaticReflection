@@ -6,8 +6,8 @@
 
         bool IsListening { get; }
 
-        bool Start();
+        bool Start(object instance);
 
-        bool Stop();
+        bool Stop(object instance);
     }
 }
