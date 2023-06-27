@@ -16,13 +16,26 @@ namespace StaticReflection.CodeGen.Generators
             var syntaxProvider = context.SyntaxProvider
                 .ForAttributeWithMetadataName(StaticReflectionAttributeConsts.Name, Predicate, Transform)
                 .Where(x => x != null);
+
             context.RegisterSourceOutput(syntaxProvider, Execute!);
+            var assemblyProvider = context.SyntaxProvider
+                .ForAttributeWithMetadataName(StaticReflectionAssemblyAttributeConsts.Name, PredicateAssembly, TransformAssembly)
+                .Where(x => x != null);
+            context.RegisterSourceOutput(assemblyProvider);
         }
         protected GeneratorTransformResult<ISymbol?>? Transform(GeneratorAttributeSyntaxContext context, CancellationToken token)
         {
             return new GeneratorTransformResult<ISymbol?>(context.TargetSymbol, context);
         }
+        protected GeneratorTransformResult<ISymbol?>? TransformAssembly(GeneratorAttributeSyntaxContext context, CancellationToken token)
+        {
+            return new GeneratorTransformResult<ISymbol?>(context.TargetSymbol, context);
+        }
         protected bool Predicate(SyntaxNode node, CancellationToken token)
+        {
+            return true;
+        }
+        protected bool PredicateAssembly(SyntaxNode node, CancellationToken token)
         {
             return true;
         }

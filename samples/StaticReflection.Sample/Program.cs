@@ -13,6 +13,9 @@ namespace StaticReflection.Sample
         static void Main(string[] args)
         {
             var a=new A();
+            var evS = ((IEventTransfer)AReflection.Instance.Events[0]);
+            evS.Start(a);
+            evS.EventTransfed += Instance_EventTransfed;
             //ABxEReflection.Instance.Start(a);
             //ABxEReflection.Instance.EventTransfed += Instance_EventTransfed;
             a.Raise(new B {  S=22});

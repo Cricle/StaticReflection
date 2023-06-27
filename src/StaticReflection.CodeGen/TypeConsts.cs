@@ -10,4 +10,8 @@ namespace StaticReflection.CodeGen
 
         public static string TypeName = "Type";
     }
+    internal static class StaticReflectionAssemblyAttributeConsts
+    {
+        public static string Name = "StaticReflection.Annotions.StaticReflectionAssemblyAttribute";
+    }
 }

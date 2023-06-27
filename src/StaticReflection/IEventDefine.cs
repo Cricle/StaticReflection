@@ -2,6 +2,18 @@
 
 namespace StaticReflection
 {
+    public static class EventDefineExecuteExtensions
+    {
+        public static bool Start(this IEventDefine eventDefine,object instance)
+        {
+            return ((IEventTransfer)eventDefine).Start(instance);
+        }
+        public static bool Stop(this IEventDefine eventDefine, object instance)
+        {
+            return ((IEventTransfer)eventDefine).Stop(instance);
+        }
+    }
+
     public interface IEventDefine : IMemberDefine
     {
         Type DelegateType { get; }
