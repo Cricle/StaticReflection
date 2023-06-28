@@ -1,12 +1,12 @@
 ﻿namespace StaticReflection
 {
-    public interface IPropertyAnonymousInvokeDefine
+    public interface IMemberAnonymousInvokeDefine
     {
         void SetValueAnonymous(object? instance, object? value);
 
         object GetValueAnonymous(object? instance);
     }
-    public interface IPropertyInvokeDefine<TInstance, TResult>
+    public interface IMemberInvokeDefine<TInstance, TResult>
     {
         void SetValue(TInstance instance, TResult value);
 

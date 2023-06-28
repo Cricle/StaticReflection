@@ -18,16 +18,16 @@ namespace StaticReflection
         {
             GetPropertyAnonymousInvoke(typeDefine, name).SetValueAnonymous(instance, value);
         }
-        public static IPropertyAnonymousInvokeDefine GetPropertyAnonymousInvoke(this ITypeDefine typeDefine, string name)
+        public static IMemberAnonymousInvokeDefine GetPropertyAnonymousInvoke(this ITypeDefine typeDefine, string name)
         {
             var prop = typeDefine.Properties.FirstOrDefault(x => x.Name == name);
             if (prop == null)
             {
                 throw new InvalidOperationException($"Type {typeDefine.Name} has not property {name}");
             }
-            if (prop is not IPropertyAnonymousInvokeDefine anonymousInvokeDefine)
+            if (prop is not IMemberAnonymousInvokeDefine anonymousInvokeDefine)
             {
-                throw new InvalidOperationException($"Type {typeDefine.Name}.{name} must implement {typeof(IPropertyAnonymousInvokeDefine)}");
+                throw new InvalidOperationException($"Type {typeDefine.Name}.{name} must implement {typeof(IMemberAnonymousInvokeDefine)}");
             }
             return anonymousInvokeDefine;
         }

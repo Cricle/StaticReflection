@@ -27,16 +27,15 @@ namespace StaticReflection.CodeGen.Generators
 
             foreach (var property in properyies)
             {
-                var hasAutoGenAttr = property.GetAttributes()
-                    .Any(x => x.AttributeClass?.ToString() == typeof(GeneratorAttribute).FullName);
-                if (hasAutoGenAttr)
+                if (IsAutoGen(property))
                 {
                     continue;
                 }
+                var avaVisi = IsAvaliableVisibility(property);
                 var ssr = name + property.Name + "PReflection";
                 var attributeStrs = GetAttributeStrings(property.GetAttributes());
                 var getBody = $"throw new System.InvalidOperationException(\"The property {targetType}.{property} is set only\");";
-                if (!property.IsWriteOnly|| property.IsReadOnly)
+                if ((!property.IsWriteOnly|| property.IsReadOnly) && avaVisi)
                 {
                     if (property.IsStatic)
                     {
@@ -48,7 +47,7 @@ namespace StaticReflection.CodeGen.Generators
                     }
                 }
                 var setBody = $"throw new System.InvalidOperationException(\"The property {targetType}.{property} is read only\");";
-                if (!property.IsReadOnly)
+                if (!property.IsReadOnly&& avaVisi)
                 {
                     if (property.IsStatic)
                     {
@@ -65,7 +64,7 @@ namespace StaticReflection.CodeGen.Generators
                 var str = $@"
     [System.Diagnostics.DebuggerStepThrough]
     [System.Runtime.CompilerServices.CompilerGenerated]
-    {visibility} sealed class {ssr}:StaticReflection.IPropertyInvokeDefine<{targetType},{property.Type}>,StaticReflection.IPropertyDefine,StaticReflection.IPropertyAnonymousInvokeDefine
+    {visibility} sealed class {ssr}:StaticReflection.IMemberInvokeDefine<{targetType},{property.Type}>,StaticReflection.IPropertyDefine,StaticReflection.IMemberAnonymousInvokeDefine
     {{
         public static readonly {ssr} Instance = new {ssr}();
 

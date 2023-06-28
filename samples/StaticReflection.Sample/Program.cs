@@ -13,8 +13,8 @@ namespace StaticReflection.Sample
         static void Main(string[] args)
         {
             var a=new A();
-            ABxEReflection.Instance.Start(a);
-            ABxEReflection.Instance.EventTransfed += Instance_EventTransfed;
+            //ABxEReflection.Instance.Start(a);
+            //ABxEReflection.Instance.EventTransfed += Instance_EventTransfed;
             a.Raise(new B {  S=22});
         }
 
@@ -39,6 +39,8 @@ namespace StaticReflection.Sample
     {
         [DefaultValue(12)]
         public int S { get; set; }
+
+        public int Fi;
 
         public event EventHandler<B> Bx;
 

@@ -10,8 +10,7 @@ namespace StaticReflection.CodeGen.Generators
         protected List<string> ExecuteEvents(SourceProductionContext context, GeneratorTransformResult<ISymbol> node, INamedTypeSymbol targetType)
         {
             var members = targetType.GetMembers();
-            var ev = members.OfType<IEventSymbol>().ToList();
-            var events = members.OfType<IEventSymbol>().Where(x=>x.Type is INamedTypeSymbol symbol&&symbol.DelegateInvokeMethod!=null).ToList();
+            var events = members.OfType<IEventSymbol>().Where(x=>x.Type is INamedTypeSymbol symbol&& IsAvaliableVisibility(x)&&symbol.DelegateInvokeMethod!=null).ToList();
             if (events.Count==0)
             {
                 return new List<string>(0);

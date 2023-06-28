@@ -27,6 +27,10 @@ namespace StaticReflection.CodeGen.Generators
             return true;
         }
 
+        private bool IsAvaliableVisibility(ISymbol symbol)
+        {
+            return symbol.DeclaredAccessibility == Accessibility.Public || symbol.DeclaredAccessibility == Accessibility.Internal || symbol.DeclaredAccessibility == Accessibility.ProtectedAndInternal;
+        }
         protected virtual string GetAccessibilityString(Accessibility accessibility)
         {
             if (accessibility == Accessibility.Private)
@@ -50,6 +54,11 @@ namespace StaticReflection.CodeGen.Generators
                 return "public";
             }
             return string.Empty;
+        }
+        private bool IsAutoGen(ISymbol symbol)
+        {
+            return symbol.GetAttributes()
+                    .Any(x => x.AttributeClass?.ToString() == typeof(GeneratorAttribute).FullName);
         }
         protected List<string> GetAttributeStrings(IEnumerable<AttributeData>? attributes)
         {
@@ -117,6 +126,7 @@ namespace StaticReflection.CodeGen.Generators
             var properties=ExecuteProperty(context, node, nameTypeTarget);
             var methods = ExecuteMethods(context, node, nameTypeTarget);
             var events = ExecuteEvents(context, node, nameTypeTarget);
+            var fields = ExecuteFields(context, node, nameTypeTarget);
 
             var ssr = $"{nameTypeTarget.Name}Reflection";
             var visibility = GetAccessibilityString(targetType.DeclaredAccessibility);
@@ -173,6 +183,8 @@ namespace {nameSpace}
         public System.Collections.Generic.IReadOnlyList<StaticReflection.IMethodDefine> Methods {{ get; }} = new StaticReflection.IMethodDefine[]{{ {string.Join(",", methods.Select(x => $"{x}.Instance"))} }};
 
         public System.Collections.Generic.IReadOnlyList<StaticReflection.IEventDefine> Events {{ get; }} = new StaticReflection.IEventDefine[]{{ {string.Join(",", events.Select(x => $"{x}.Instance"))} }};
+
+        public System.Collections.Generic.IReadOnlyList<StaticReflection.IFieldDefine> Fields {{ get; }} = new StaticReflection.IFieldDefine[]{{ {string.Join(",", fields.Select(x => $"{x}.Instance"))} }};
     }}
 }}
 ";

@@ -12,7 +12,7 @@ namespace StaticReflection.CodeGen.Generators
         {
             var members = targetType.GetMembers();
             var methods = members.OfType<IMethodSymbol>()
-                .Where(x => x.MethodKind == MethodKind.Ordinary&&!x.IsGenericMethod&&(x.DeclaredAccessibility== Accessibility.Public|| x.DeclaredAccessibility == Accessibility.Internal||x.DeclaredAccessibility== Accessibility.ProtectedAndInternal) && (!x.Name.StartsWith("<") || !x.Name.EndsWith("$")))
+                .Where(x => x.MethodKind == MethodKind.Ordinary&&!x.IsGenericMethod&& IsAvaliableVisibility(x) && (!x.Name.StartsWith("<") || !x.Name.EndsWith("$")))
                 .ToList();
             if (methods.Count==0)
             {
