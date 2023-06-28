@@ -21,7 +21,7 @@ namespace StaticReflection.CodeGen.Generators
             var assemblyProvider = context.SyntaxProvider
                 .ForAttributeWithMetadataName(StaticReflectionAssemblyAttributeConsts.Name, PredicateAssembly, TransformAssembly)
                 .Where(x => x != null);
-            context.RegisterSourceOutput(assemblyProvider);
+            context.RegisterImplementationSourceOutput(assemblyProvider, ExecuteAssembly!);
         }
         protected GeneratorTransformResult<ISymbol?>? Transform(GeneratorAttributeSyntaxContext context, CancellationToken token)
         {
@@ -92,9 +92,31 @@ namespace StaticReflection.CodeGen.Generators
         {
             return b ? "true" : "false";
         }
+        protected void ExecuteAssembly(SourceProductionContext context, GeneratorTransformResult<ISymbol> node)
+        {
+            var targetType = (INamedTypeSymbol)node.SyntaxContext.TargetSymbol;
+            var visibility = GetAccessibilityString(targetType.DeclaredAccessibility);
+            var nameSpace = targetType.ContainingNamespace.ToString();
+            var name = targetType.Name;
+            var staticKeyWorld = targetType.IsStatic?"static ":string.Empty;
+            var str = $@"
+namespace {nameSpace}
+{{
+    {visibility} partial {staticKeyWorld}class {name}
+    {{
+        public System.Collections.Generic.IReadOnlyList<StaticReflection.ITypeDefine> Types{{ get; }} = new System.Collections.Generic.List<StaticReflection.ITypeDefine>
+        {{
+            {string.Join(",\n",refTypes.Select(x=>x+".Instance"))}
+        }};
+    }}
+}}
+"; 
+            var code = FormatCode(str);
+            context.AddSource($"{name}.g.cs", code);
+
+        }
         protected void Execute(SourceProductionContext context, GeneratorTransformResult<ISymbol> node)
         {
-            var sn = node.SyntaxContext.SemanticModel;
             var targetType = node.SyntaxContext.TargetSymbol;
             if (node.Value != null)
             {
@@ -121,6 +143,8 @@ namespace StaticReflection.CodeGen.Generators
 
         private StringBuilder sourceScript = new StringBuilder();
 
+        private List<string> refTypes = new List<string>();
+
         protected void ExecuteOne(SourceProductionContext context, GeneratorTransformResult<ISymbol> node, AttributeData data, ISymbol targetType)
         {
             INamedTypeSymbol? nameTypeTarget = targetType as INamedTypeSymbol;
@@ -146,7 +170,7 @@ namespace StaticReflection.CodeGen.Generators
 
             var nameSpace = targetType.ContainingNamespace.ToString();
             var attributeStrs = GetAttributeStrings(targetType.GetAttributes());
-
+            refTypes.Add(nameSpace+"."+ssr);
             var str = $@"
 #pragma warning disable CS9082
 namespace {nameSpace}

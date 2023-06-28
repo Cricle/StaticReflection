@@ -52,4 +52,9 @@ namespace StaticReflection.Sample
             Bx?.Invoke(this, b);
         }
     }
+    [StaticReflectionAssembly]
+    public partial class C
+    {
+
+    }
 }
