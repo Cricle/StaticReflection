@@ -16,6 +16,10 @@ namespace StaticReflection.Sample
             //ABxEReflection.Instance.Start(a);
             //ABxEReflection.Instance.EventTransfed += Instance_EventTransfed;
             a.Raise(new B {  S=22});
+            foreach (var item in AReflection.Instance.Methods)
+            {
+                Console.WriteLine(item.Name);
+            }
         }
 
         private static void Instance_EventTransfed(object? sender, EventTransferEventArgs e)
@@ -37,6 +41,15 @@ namespace StaticReflection.Sample
     }
     public class A
     {
+        public A()
+        {
+
+        }
+        public A(int s)
+        {
+
+        }
+
         [DefaultValue(12)]
         public int S { get; set; }
 
