@@ -8,6 +8,73 @@ namespace StaticReflection.CodeGen.Generators
 {
     public partial class StaticReflectionGenerator
     {
+        private void GetMethodDefine(INamedTypeSymbol targetType,
+            IMethodSymbol method,
+            out string implementInvokeInterface,
+            out string invokeImplement,
+            out bool argOutof16,
+            out bool hasReturn,
+            out string unsafeScript)
+        {
+            argOutof16 = method.Parameters.Length > 16;
+            hasReturn = !method.ReturnsVoid;
+            implementInvokeInterface = ",";
+            unsafeScript = @"
+#if !NET7_0_OR_GREATER
+unsafe
+#endif
+";
+            if (argOutof16)
+            {
+                if (hasReturn)
+                {
+                    implementInvokeInterface += $"StaticReflection.Invoking.IArgsAnyMethod<{targetType},{method.ReturnType}>,StaticReflection.Invoking.IArgsAnyAnonymousMethod";
+                    invokeImplement = $"public {unsafeScript} ref {method.ReturnType} Invoke({targetType} instance, params object[] inputs)";
+                }
+                else
+                {
+                    implementInvokeInterface += $"StaticReflection.Invoking.IVoidArgsAnyMethod<{targetType}>,StaticReflection.Invoking.IVoidArgsAnyAnonymousMethod";
+                    invokeImplement = $"public {unsafeScript} void Invoke({targetType} instance, params object[] inputs)";
+                }
+            }
+            else if (method.Parameters.Length == 0)
+            {
+                if (hasReturn)
+                {
+                    implementInvokeInterface += $"StaticReflection.Invoking.IArgsMethod<{targetType},{method.ReturnType}>,StaticReflection.Invoking.IArgs{method.Parameters.Length}AnonymousMethod";
+                    invokeImplement = $"public {unsafeScript} ref {method.ReturnType} Invoke({targetType} instance)";
+                }
+                else
+                {
+                    implementInvokeInterface += $"StaticReflection.Invoking.IVoidArgsMethod<{targetType}>,StaticReflection.Invoking.IVoidArgs{method.Parameters.Length}AnonymousMethod";
+                    invokeImplement = $"public {unsafeScript} void Invoke({targetType} instance)";
+                }
+            }
+            else
+            {
+                var args = string.Join(",", method.Parameters.Select((x, i) => $"ref {x.Type} arg{i}"));
+                if (hasReturn)
+                {
+                    implementInvokeInterface += $"StaticReflection.Invoking.IArgsMethod<{targetType},{method.ReturnType},";
+                    invokeImplement = $"public {unsafeScript} ref {method.ReturnType} Invoke({targetType} instance,{args})";
+                }
+                else
+                {
+                    implementInvokeInterface += $"StaticReflection.Invoking.IVoidArgsMethod<{targetType},";
+                    invokeImplement = $"public {unsafeScript} void Invoke({targetType} instance,{args})";
+                }
+                implementInvokeInterface += string.Join(",", method.Parameters.Select(x => x.Type)) + ">";
+                if (hasReturn)
+                {
+                    implementInvokeInterface += $",StaticReflection.Invoking.IArgs{method.Parameters.Length}AnonymousMethod";
+                }
+                else
+                {
+                    implementInvokeInterface += $",StaticReflection.Invoking.IVoidArgs{method.Parameters.Length}AnonymousMethod";
+                }
+            }
+        }
+
         private string CreateMethodProperies(string targetType,IMethodSymbol method)
         {
             var typePars = new List<string>();
@@ -65,63 +132,13 @@ namespace StaticReflection.CodeGen.Generators
 
             if (!method.IsGenericMethod&&IsAvaliableVisibility(method))
             {
-                var argOutof16 = method.Parameters.Length > 16;
-                var hasReturn = !method.ReturnsVoid;
-                implementInvokeInterface = ",";
-                var unsafeScript = @"
-#if !NET7_0_OR_GREATER
-unsafe
-#endif
-";
-                if (argOutof16)
-                {
-                    if (hasReturn)
-                    {
-                        implementInvokeInterface += $"StaticReflection.Invoking.IArgsAnyMethod<{targetType},{method.ReturnType}>,StaticReflection.Invoking.IArgsAnyAnonymousMethod";
-                        invokeImplement = $"public {unsafeScript} ref {method.ReturnType} Invoke({targetType} instance, params object[] inputs)";
-                    }
-                    else
-                    {
-                        implementInvokeInterface += $"StaticReflection.Invoking.IVoidArgsAnyMethod<{targetType}>,StaticReflection.Invoking.IVoidArgsAnyAnonymousMethod";
-                        invokeImplement = $"public {unsafeScript} void Invoke({targetType} instance, params object[] inputs)";
-                    }
-                }
-                else if (method.Parameters.Length == 0)
-                {
-                    if (hasReturn)
-                    {
-                        implementInvokeInterface += $"StaticReflection.Invoking.IArgsMethod<{targetType},{method.ReturnType}>,StaticReflection.Invoking.IArgs{method.Parameters.Length}AnonymousMethod";
-                        invokeImplement = $"public {unsafeScript} ref {method.ReturnType} Invoke({targetType} instance)";
-                    }
-                    else
-                    {
-                        implementInvokeInterface += $"StaticReflection.Invoking.IVoidArgsMethod<{targetType}>,StaticReflection.Invoking.IVoidArgs{method.Parameters.Length}AnonymousMethod";
-                        invokeImplement = $"public {unsafeScript} void Invoke({targetType} instance)";
-                    }
-                }
-                else
-                {
-                    var args = string.Join(",", method.Parameters.Select((x, i) => $"ref {x.Type} arg{i}"));
-                    if (hasReturn)
-                    {
-                        implementInvokeInterface += $"StaticReflection.Invoking.IArgsMethod<{targetType},{method.ReturnType},";
-                        invokeImplement = $"public {unsafeScript} ref {method.ReturnType} Invoke({targetType} instance,{args})";
-                    }
-                    else
-                    {
-                        implementInvokeInterface += $"StaticReflection.Invoking.IVoidArgsMethod<{targetType},";
-                        invokeImplement = $"public {unsafeScript} void Invoke({targetType} instance,{args})";
-                    }
-                    implementInvokeInterface += string.Join(",", method.Parameters.Select(x => x.Type)) + ">";
-                    if (hasReturn)
-                    {
-                        implementInvokeInterface += $",StaticReflection.Invoking.IArgs{method.Parameters.Length}AnonymousMethod";
-                    }
-                    else
-                    {
-                        implementInvokeInterface += $",StaticReflection.Invoking.IVoidArgs{method.Parameters.Length}AnonymousMethod";
-                    }
-                }
+                GetMethodDefine(targetType,
+                    method, 
+                    out implementInvokeInterface, 
+                    out invokeImplement, 
+                    out bool argOutof16,
+                out bool hasReturn,
+                out string unsafeScript);
                 invokeImplement += "\n{\n";
 
                 var initCodes = new StringBuilder();
