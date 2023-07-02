@@ -28,9 +28,9 @@
 
         public bool Start(object instance)
         {
-            if (Interlocked.CompareExchange(ref isListening, 1, 0) == 1)
+            if (Interlocked.CompareExchange(ref isListening, 0, 1) == 0)
             {
-
+                OnStart(instance);
                 return true;
             }
             return false;
@@ -38,9 +38,9 @@
         protected abstract void OnStart(object instance);
         public bool Stop(object instance)
         {
-            if (Interlocked.CompareExchange(ref isListening, 0, 1) == 0)
+            if (Interlocked.CompareExchange(ref isListening, 1, 0) == 1)
             {
-
+                OnStop(instance);
                 return true;
             }
             return false;
