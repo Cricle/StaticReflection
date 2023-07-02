@@ -4,6 +4,8 @@
     {
         Type ReturnType { get; }
 
+        StaticMethodKind MethodKind { get; }
+
         IReadOnlyList<Type> ArgumentTypes { get; }
 
         bool IsGenericMethod { get; }

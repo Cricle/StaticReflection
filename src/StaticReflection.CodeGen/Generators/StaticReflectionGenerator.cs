@@ -164,6 +164,7 @@ namespace {nameSpace}
             var methods = ExecuteMethods(context, node, nameTypeTarget);
             var events = ExecuteEvents(context, node, nameTypeTarget);
             var fields = ExecuteFields(context, node, nameTypeTarget);
+            var constructors = ExecuteConstructor(context, node, nameTypeTarget);
 
             var ssr = $"{nameTypeTarget.Name}Reflection";
             var visibility = GetAccessibilityString(targetType.DeclaredAccessibility);
@@ -222,6 +223,8 @@ namespace {nameSpace}
         public System.Collections.Generic.IReadOnlyList<StaticReflection.IEventDefine> Events {{ get; }} = new StaticReflection.IEventDefine[]{{ {string.Join(",", events.Select(x => $"{x}.Instance"))} }};
 
         public System.Collections.Generic.IReadOnlyList<StaticReflection.IFieldDefine> Fields {{ get; }} = new StaticReflection.IFieldDefine[]{{ {string.Join(",", fields.Select(x => $"{x}.Instance"))} }};
+        
+        public System.Collections.Generic.IReadOnlyList<StaticReflection.IConstructorDefine> Constructors {{ get; }} = new StaticReflection.IConstructorDefine[]{{ {string.Join(",", constructors.Select(x => $"{x}.Instance"))} }};
     }}
 }}
 ";

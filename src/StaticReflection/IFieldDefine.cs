@@ -4,10 +4,6 @@ using System.Text;
 
 namespace StaticReflection
 {
-    public interface IConstructorDefine: IAttributeDefine, IMemberDefine
-    {
-
-    }
     public interface IFieldDefine: IAttributeDefine, IMemberDefine
     {
         Type PropertyType { get; }

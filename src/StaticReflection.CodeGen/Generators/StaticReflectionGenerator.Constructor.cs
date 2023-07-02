@@ -7,6 +7,45 @@ namespace StaticReflection.CodeGen.Generators
 {
     public partial class StaticReflectionGenerator
     {
+        protected string CreateSymbolProperties(ISymbol symbol)
+        {
+            var attributeStrs = GetAttributeStrings(symbol.GetAttributes());
+
+            return $@"
+
+        public System.String Name {{ get; }} = ""{symbol.Name}"";
+
+        public System.String MetadataName {{ get; }} = ""{symbol.MetadataName}"";
+
+        public System.Boolean IsVirtual {{ get; }} = {BoolToString(symbol.IsVirtual)};
+
+        public System.Boolean IsStatic {{ get; }} = {BoolToString(symbol.IsStatic)};
+
+        public System.Boolean IsOverride {{ get; }} = {BoolToString(symbol.IsOverride)};
+
+        public System.Boolean IsAbstract {{ get; }} = {BoolToString(symbol.IsAbstract)};
+
+        public System.Boolean IsSealed {{ get; }} = {BoolToString(symbol.IsSealed)};
+
+        public System.Boolean IsDefinition {{ get; }} = {BoolToString(symbol.IsDefinition)};
+
+        public System.Boolean IsExtern {{ get; }} = {BoolToString(symbol.IsExtern)};
+
+        public System.Boolean IsImplicitlyDeclared {{ get; }} = {BoolToString(symbol.IsImplicitlyDeclared)};
+        
+        public System.Boolean CanBeReferencedByName {{ get; }} = {BoolToString(symbol.CanBeReferencedByName)};
+        
+        public System.Boolean IsPublic {{ get; }} = {BoolToString(symbol.DeclaredAccessibility == Accessibility.Public)};
+        
+        public System.Boolean IsPrivate {{ get; }} = {BoolToString(symbol.DeclaredAccessibility == Accessibility.Private)};
+        
+        public System.Boolean IsProtected {{ get; }} = {BoolToString(symbol.DeclaredAccessibility == Accessibility.Protected || symbol.DeclaredAccessibility == Accessibility.ProtectedAndInternal)};
+        
+        public System.Boolean IsInternal {{ get; }} = {BoolToString(symbol.DeclaredAccessibility == Accessibility.Internal || symbol.DeclaredAccessibility == Accessibility.ProtectedAndInternal)};
+         
+        public System.Collections.Generic.IReadOnlyList<System.Attribute> Attributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", attributeStrs)} }};
+";
+        }
         protected List<string> ExecuteConstructor(SourceProductionContext context, GeneratorTransformResult<ISymbol> node, INamedTypeSymbol targetType)
         {
             var members = targetType.GetMembers();
@@ -24,56 +63,34 @@ namespace StaticReflection.CodeGen.Generators
 
             var types = new List<string>();
 
-            foreach (var @event in constructors)
+            var index = 0;
+            foreach (var constructor in constructors)
             {
-                var ssr = name + @event.Name + "CReflection";
-                var attributeStrs = GetAttributeStrings(@event.GetAttributes());
+                var ssr = name + index + "CReflection";
+                index++;
+                var attributeStrs = GetAttributeStrings(constructor.GetAttributes());
 
+                var interfaceName = string.Empty;
+                var interfaceImpl = string.Empty;
+                if (IsAvaliableVisibility(constructor))
+                {
+
+                }
                 types.Add(ssr);
-
                 var str = $@"
     [System.Diagnostics.DebuggerStepThrough]
     [System.Runtime.CompilerServices.CompilerGenerated]
-    {visibility} sealed class {ssr}:StaticReflection.IConstructorDefine
+    {visibility} sealed class {ssr} : StaticReflection.IConstructorDefine{interfaceName}
     {{
         public static readonly {ssr} Instance = new {ssr}();
 
         private {ssr}(){{ }}
 
-        public System.String Name {{ get; }} = ""{@event.Name}"";
-
-        public System.Type DeclareType {{ get; }} = typeof({targetType});
-
-        public System.String MetadataName {{ get; }} = ""{@event.MetadataName}"";
-
-        public System.Boolean IsVirtual {{ get; }} = {BoolToString(@event.IsVirtual)};
-
-        public System.Boolean IsStatic {{ get; }} = {BoolToString(@event.IsStatic)};
-
-        public System.Boolean IsOverride {{ get; }} = {BoolToString(@event.IsOverride)};
-
-        public System.Boolean IsAbstract {{ get; }} = {BoolToString(@event.IsAbstract)};
-
-        public System.Boolean IsSealed {{ get; }} = {BoolToString(@event.IsSealed)};
-
-        public System.Boolean IsDefinition {{ get; }} = {BoolToString(@event.IsDefinition)};
-
-        public System.Boolean IsExtern {{ get; }} = {BoolToString(@event.IsExtern)};
-
-        public System.Boolean IsImplicitlyDeclared {{ get; }} = {BoolToString(@event.IsImplicitlyDeclared)};
-        
-        public System.Boolean CanBeReferencedByName {{ get; }} = {BoolToString(@event.CanBeReferencedByName)};
-        
-        public System.Boolean IsPublic {{ get; }} = {BoolToString(@event.DeclaredAccessibility == Accessibility.Public)};
-        
-        public System.Boolean IsPrivate {{ get; }} = {BoolToString(@event.DeclaredAccessibility == Accessibility.Private)};
-        
-        public System.Boolean IsProtected {{ get; }} = {BoolToString(@event.DeclaredAccessibility == Accessibility.Protected || @event.DeclaredAccessibility == Accessibility.ProtectedAndInternal)};
-        
-        public System.Boolean IsInternal {{ get; }} = {BoolToString(@event.DeclaredAccessibility == Accessibility.Internal || @event.DeclaredAccessibility == Accessibility.ProtectedAndInternal)};
-         
-        public System.Collections.Generic.IReadOnlyList<System.Attribute> Attributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", attributeStrs)} }};
-    }}";
+        {CreateSymbolProperties(constructor)}
+        {CreateMethodProperies(targetType.ToString(), constructor)}
+        {interfaceImpl}
+    }}
+";
                 scriptBuilder.AppendLine(str);
             }
 
