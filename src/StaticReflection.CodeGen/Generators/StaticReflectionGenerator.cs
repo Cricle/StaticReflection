@@ -118,7 +118,7 @@ namespace {nameSpace}
         {withDefault}
         public System.Collections.Generic.IReadOnlyList<StaticReflection.ITypeDefine> Types{{ get; }} = new System.Collections.Generic.List<StaticReflection.ITypeDefine>
         {{
-            {string.Join(",\n",refTypes.Select(x=>x+".Instance"))}
+            {string.Join(",\n",refTypes.Distinct().Select(x=>x+".Instance"))}
         }};
     }}
 }}
@@ -185,6 +185,7 @@ namespace {nameSpace}
             var attributeStrs = GetAttributeStrings(targetType.GetAttributes());
             refTypes.Add(nameSpace+"."+ssr);
             var str = $@"
+{GenHeaders.AutoGenHead}
 #pragma warning disable CS9082
 namespace {nameSpace}
 {{
