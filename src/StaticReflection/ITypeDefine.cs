@@ -7,5 +7,7 @@
         IReadOnlyList<IMethodDefine> Methods { get; }
 
         IReadOnlyList<IEventDefine> Events { get; }
+
+        IReadOnlyList<IConstructorDefine> Constructors { get; }
     }
 }

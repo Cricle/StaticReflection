@@ -3,11 +3,12 @@ using System.Diagnostics;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 
+
+[assembly:StaticReflection(Type= typeof(StaticReflection.Sample.A))]
 namespace StaticReflection.Sample
 {
     internal class Program
     {
-        [StaticReflection]
         [StaticReflection(Type =typeof(B))]
         public A a { get; set; }
 
@@ -20,7 +21,7 @@ namespace StaticReflection.Sample
             //ABxEReflection.Instance.Start(a);
             //ABxEReflection.Instance.EventTransfed += Instance_EventTransfed;
             a.Raise(new B {  S=22});
-            foreach (var item in C.Default.Types)
+            foreach (var item in C.Default.Types[0].Constructors)
             {
                 Console.WriteLine(item.Name);
             }
@@ -54,6 +55,7 @@ namespace StaticReflection.Sample
         {
 
         }
+        [AmbientValue("aa")]
         public A(int s)
         {
 
