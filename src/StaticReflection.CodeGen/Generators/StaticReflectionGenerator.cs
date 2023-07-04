@@ -108,14 +108,62 @@ namespace StaticReflection.CodeGen.Generators
                 withDefault = $"public static {name} Default {{ get; }} = new {name}();";
             }
 
+            var assemblySymbol = targetType.ContainingAssembly;
+            var assemblyIdentity = assemblySymbol.Identity;
+            var assemblyNameSpace = assemblySymbol.GlobalNamespace;
+
+            var moduleDefines=new Dictionary<string, string>();
+
+            foreach (var item in assemblySymbol.Modules)
+            {
+                var moduleName = $"{item.Name.Replace(".","_")}Module";
+                var script = $@"
+
+class {moduleName}:StaticReflection.IModuleIdentity
+{{
+    {CreateSymbolProperties(item)}
+
+    public System.Type DeclareType {{ get; }} = null;
+    
+    public StaticReflection.INameSpaceIdentity GlobalNamespace {{ get; }} = {CreateNameSpaceIdentity(assemblyNameSpace)};
+
+    public System.Collections.Generic.IReadOnlyList<StaticReflection.IAssemblyIdentity> ReferencedAssemblies {{ get; }} = new StaticReflection.IAssemblyIdentity[]{{ {string.Join(",",item.ReferencedAssemblies.Select(CreateAssemblyIdentity))} }};
+
+    public System.Collections.Generic.IReadOnlyList<System.String> ReferencedAssemblySymbolNames {{ get; }} = new System.String[]{{ {string.Join(",",item.ReferencedAssemblySymbols.Select(x=>$"\"{x.Name}\"")) }}};
+}}
+";
+                moduleDefines[moduleName] = script;
+            }
+
             var str = $@"
 {GenHeaders.AutoGenHead}
 namespace {nameSpace}
 {{
     {GenHeaders.AttackAttribute}
-    {visibility} partial {staticKeyWorld}class {name}
+    {visibility} partial {staticKeyWorld}class {name}:StaticReflection.IAssemblyDefine
     {{
         {withDefault}
+        
+        {string.Join("\n", moduleDefines.Values)}
+
+        {CreateSymbolProperties(assemblySymbol)}
+
+        public System.Boolean IsInteractive {{ get; }} = {BoolToString(assemblySymbol.IsInteractive)};
+
+        public StaticReflection.IAssemblyIdentity Identity {{ get; }} = {CreateAssemblyIdentity(assemblyIdentity)};
+        
+        public StaticReflection.INameSpaceIdentity GlobalNamespace {{ get; }} = {CreateNameSpaceIdentity(assemblyNameSpace)};
+        
+        public System.Collections.Generic.IReadOnlyList<StaticReflection.IModuleIdentity> Modules {{ get; }} = new StaticReflection.IModuleIdentity[] {{ {string.Join(",", moduleDefines.Keys.Select(x=>$"new {x}()"))} }};
+
+        public System.Collections.Generic.IReadOnlyList<string> TypeNames {{ get; }}= new System.String[] {{ {string.Join(",",assemblySymbol.TypeNames.Select(x=>$"\"{x}\""))} }};
+
+        public System.Collections.Generic.IReadOnlyList<string> NamespaceNames {{ get; }}= new System.String[] {{ {string.Join(",", assemblySymbol.NamespaceNames.Select(x => $"\"{x}\""))} }};
+
+        public System.Boolean MightContainExtensionMethods {{ get; }} = {BoolToString(assemblySymbol.MightContainExtensionMethods)};
+
+        public System.Type DeclareType {{ get; }} = null;
+
         public System.Collections.Generic.IReadOnlyList<StaticReflection.ITypeDefine> Types{{ get; }} = new System.Collections.Generic.List<StaticReflection.ITypeDefine>
         {{
             {string.Join(",\n",refTypes.Distinct().Select(x=>x+".Instance"))}
@@ -126,6 +174,18 @@ namespace {nameSpace}
             var code = FormatCode(str);
             context.AddSource($"{name}.g.cs", code);
 
+        }
+        private string CreateAssemblyIdentity(AssemblyIdentity assemblyIdentity)
+        {
+            return $"new StaticReflection.StaticAssemblyIdentity(\"{assemblyIdentity.Name}\",System.Version.Parse(\"{assemblyIdentity.Version}\"),\"{assemblyIdentity.CultureName}\",global::System.Reflection.AssemblyNameFlags.{assemblyIdentity.Flags},global::System.Reflection.AssemblyContentType.{assemblyIdentity.ContentType},{BoolToString(assemblyIdentity.HasPublicKey)},{BytesToString(assemblyIdentity.PublicKey)},{BytesToString(assemblyIdentity.PublicKeyToken)},{BoolToString(assemblyIdentity.IsStrongName)},{BoolToString(assemblyIdentity.IsRetargetable)})";
+        }
+        private string CreateNameSpaceIdentity(INamespaceSymbol assemblyNameSpace)
+        {
+            return $"new StaticReflection.StaticNameSpaceIdentity(\"{assemblyNameSpace.Name}\",{BoolToString(assemblyNameSpace.IsGlobalNamespace)},global::StaticReflection.StaticNamespaceKind.{assemblyNameSpace.NamespaceKind})";
+        }
+        private string BytesToString(IEnumerable<byte> bytes)
+        {
+            return $"new System.Byte[]{{ {string.Join(",",bytes)} }}";
         }
         protected void Execute(SourceProductionContext context, GeneratorTransformResult<ISymbol> node)
         {
