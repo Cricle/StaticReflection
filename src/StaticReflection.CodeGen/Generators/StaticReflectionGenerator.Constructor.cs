@@ -78,8 +78,7 @@ namespace StaticReflection.CodeGen.Generators
                 }
                 types.Add(ssr);
                 var str = $@"
-    [System.Diagnostics.DebuggerStepThrough]
-    [System.Runtime.CompilerServices.CompilerGenerated]
+    {GenHeaders.AttackAttribute}
     {visibility} sealed class {ssr} : StaticReflection.IConstructorDefine{interfaceName}
     {{
         public static readonly {ssr} Instance = new {ssr}();

@@ -63,8 +63,7 @@ namespace StaticReflection.CodeGen.Generators
                 types.Add(ssr);
 
                 var str = $@"
-    [System.Diagnostics.DebuggerStepThrough]
-    [System.Runtime.CompilerServices.CompilerGenerated]
+    {GenHeaders.AttackAttribute}
     {visibility} sealed class {ssr}:StaticReflection.IMemberInvokeDefine<{targetType},{property.Type}>,StaticReflection.IPropertyDefine,StaticReflection.IMemberAnonymousInvokeDefine
     {{
         public static readonly {ssr} Instance = new {ssr}();

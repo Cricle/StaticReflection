@@ -33,8 +33,7 @@ namespace StaticReflection.CodeGen.Generators
                 types.Add(ssr);
 
                 var str = $@"
-    [System.Diagnostics.DebuggerStepThrough]
-    [System.Runtime.CompilerServices.CompilerGenerated]
+    {GenHeaders.AttackAttribute}
     {visibility} sealed class {ssr}:StaticReflection.EventTransfer, StaticReflection.IEventDefine
     {{
         public static readonly {ssr} Instance = new {ssr}();

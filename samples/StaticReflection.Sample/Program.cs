@@ -1,6 +1,7 @@
 ﻿using StaticReflection.Annotions;
 using System.Diagnostics;
 using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace StaticReflection.Sample
 {
@@ -19,7 +20,7 @@ namespace StaticReflection.Sample
             //ABxEReflection.Instance.Start(a);
             //ABxEReflection.Instance.EventTransfed += Instance_EventTransfed;
             a.Raise(new B {  S=22});
-            foreach (var item in AReflection.Instance.Methods)
+            foreach (var item in C.Default.Types)
             {
                 Console.WriteLine(item.Name);
             }
@@ -34,6 +35,11 @@ namespace StaticReflection.Sample
         }
     }
 
+    [JsonSerializable(typeof(B))]
+    public partial class Bc:JsonSerializerContext
+    {
+
+    }
     public record class B
     {
         public int S { get; set; }

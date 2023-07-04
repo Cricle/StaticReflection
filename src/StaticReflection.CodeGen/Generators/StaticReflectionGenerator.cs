@@ -99,11 +99,23 @@ namespace StaticReflection.CodeGen.Generators
             var nameSpace = targetType.ContainingNamespace.ToString();
             var name = targetType.Name;
             var staticKeyWorld = targetType.IsStatic?"static ":string.Empty;
+            var withDefault = string.Empty;
+            var attr = targetType.GetAttributes().FirstOrDefault(x => x.AttributeClass?.ToString() == StaticReflectionAssemblyAttributeConsts.Name);
+            if (attr!=null&&
+                (attr.NamedArguments.FirstOrDefault(x=>x.Key==StaticReflectionAssemblyAttributeConsts.WithDefaultName).Value.Value is bool b&&b||
+                !attr.NamedArguments.Any(x=>x.Key== StaticReflectionAssemblyAttributeConsts.WithDefaultName)))
+            {
+                withDefault = $"public static {name} Default {{ get; }} = new {name}();";
+            }
+
             var str = $@"
+{GenHeaders.AutoGenHead}
 namespace {nameSpace}
 {{
+    {GenHeaders.AttackAttribute}
     {visibility} partial {staticKeyWorld}class {name}
     {{
+        {withDefault}
         public System.Collections.Generic.IReadOnlyList<StaticReflection.ITypeDefine> Types{{ get; }} = new System.Collections.Generic.List<StaticReflection.ITypeDefine>
         {{
             {string.Join(",\n",refTypes.Select(x=>x+".Instance"))}
@@ -176,6 +188,7 @@ namespace {nameSpace}
 #pragma warning disable CS9082
 namespace {nameSpace}
 {{
+    {GenHeaders.AttackAttribute}
     {visibility} sealed class {ssr} : ITypeDefine
     {{
         {sourceScript}

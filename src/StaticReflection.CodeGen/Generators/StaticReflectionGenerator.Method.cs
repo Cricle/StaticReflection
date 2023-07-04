@@ -268,8 +268,7 @@ public void InvokeAnonymous(object instance{argStr})
                 }
             }
             var str = $@"
-    [System.Diagnostics.DebuggerStepThrough]
-    [System.Runtime.CompilerServices.CompilerGenerated]
+    {GenHeaders.AttackAttribute}
     {visibility} sealed class {name} : StaticReflection.IMethodDefine{implementInvokeInterface}
     {{
         public static readonly {name} Instance = new {name}();
