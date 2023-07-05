@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 
-
 [assembly:StaticReflection(Type= typeof(StaticReflection.Sample.A))]
 namespace StaticReflection.Sample
 {
@@ -16,18 +15,23 @@ namespace StaticReflection.Sample
         {
             var a=new A();
             var evS = ((IEventTransfer)AReflection.Instance.Events[0]);
-            evS.Start(a);
-            evS.EventTransfed += Instance_EventTransfed;
+            using (var scope=evS.CreateScope(a))
+            {
+                scope.Start();
+                scope.EventTransfed += Instance_EventTransfed;
+                a.Raise(new B { S = 22 });
+                scope.Stop();
+                a.Raise(new B { S = 22 });
+            }
             //ABxEReflection.Instance.Start(a);
             //ABxEReflection.Instance.EventTransfed += Instance_EventTransfed;
-            a.Raise(new B {  S=22});
-            foreach (var item in C.Default.Types[0].Constructors)
-            {
-                if (item.ArgumentTypes.Count == 0)
-                {
-                    Console.WriteLine(item.InvokeMethod(null));
-                }
-            }
+            //foreach (var item in C.Default.Types[0].Constructors)
+            //{
+            //    if (item.ArgumentTypes.Count == 0)
+            //    {
+            //        Console.WriteLine(item.InvokeMethod(null));
+            //    }
+            //}
         }
 
         private static void Instance_EventTransfed(object? sender, EventTransferEventArgs e)
@@ -39,11 +43,6 @@ namespace StaticReflection.Sample
         }
     }
 
-    [JsonSerializable(typeof(B))]
-    public partial class Bc:JsonSerializerContext
-    {
-
-    }
     public record class B
     {
         public int S { get; set; }

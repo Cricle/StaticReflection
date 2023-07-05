@@ -1,13 +1,30 @@
 ﻿namespace StaticReflection
 {
-    public interface IEventTransfer
+    public interface IEventBearing
     {
         event EventHandler<EventTransferEventArgs> EventTransfed;
+    }
+    public interface IEventTransfer: IEventBearing
+    {
+        bool IsListening { get; }
+
+        bool Start(object? instance);
+
+        bool Stop(object? instance);
+
+        IEventTransferScope CreateScope(object? instance);
+    }
+
+    public interface IEventTransferScope: IEventBearing,IDisposable
+    {
+        IEventTransfer Root { get; }
 
         bool IsListening { get; }
 
-        bool Start(object instance);
+        object? Instance { get; }
 
-        bool Stop(object instance);
+        bool Start();
+
+        bool Stop();
     }
 }

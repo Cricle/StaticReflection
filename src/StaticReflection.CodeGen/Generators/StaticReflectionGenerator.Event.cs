@@ -29,15 +29,81 @@ namespace StaticReflection.CodeGen.Generators
                 var ssr = name + @event.Name + "EReflection";
                 var attributeStrs = GetAttributeStrings(@event.GetAttributes());
                 var delegateInvokeMethod = ((INamedTypeSymbol)@event.Type).DelegateInvokeMethod!;
-
                 types.Add(ssr);
+
+                var implInterface = string.Empty;
+                var additionClass = string.Empty;
+                var implMethods = string.Empty;
+                if (IsAvaliableVisibility(@event)&&@event.AddMethod!=null&&@event.RemoveMethod!=null)
+                {                
+                    var scopeClassName = ssr + "Scope";//Static ?
+                    var selectVisit = string.Empty;
+                    if (@event.IsStatic)
+                    {
+                        selectVisit = @event.ContainingType.ToString();
+                    }
+                    else
+                    {
+                        selectVisit = $"(({targetType})instance)";
+                    }
+                    var scopeName = ssr + "Scope";
+                    additionClass = $@"
+    {GenHeaders.AttackAttribute}
+    {visibility} sealed class {scopeName}:StaticReflection.EventTransferScope
+    {{
+        public {scopeName}(IEventTransfer root, object? instance)
+            :base(root,instance)
+        {{
+        }}
+        protected override void OnStart()
+        {{
+            {selectVisit}.{@event.Name}+=OnEventRaise;
+        }}
+        protected override void OnStop()
+        {{
+            {selectVisit}.{@event.Name}-=OnEventRaise;
+        }}
+        private void OnEventRaise({string.Join(",", delegateInvokeMethod.Parameters.Select(x => $"{x.Type} {x.Name}"))})
+        {{
+            OnEventTransfed(new StaticReflection.EventTransferEventArgs(new System.Object[]
+            {{
+                {string.Join(",", delegateInvokeMethod.Parameters.Select(x => x.Name))}
+            }}));
+        }}
+    }}
+";
+                    implInterface = "StaticReflection.EventTransfer,";
+                    implMethods = $@"
+        protected override void OnStart(object instance)
+        {{
+            {selectVisit}.{@event.Name}+=OnEventRaise;
+        }}
+        protected override void OnStop(object instance)
+        {{
+            {selectVisit}.{@event.Name}-=OnEventRaise;
+        }}
+        private void OnEventRaise({string.Join(",", delegateInvokeMethod.Parameters.Select(x => $"{x.Type} {x.Name}"))})
+        {{
+            OnEventTransfed(new StaticReflection.EventTransferEventArgs(new System.Object[]
+            {{
+                {string.Join(",", delegateInvokeMethod.Parameters.Select(x => x.Name))}
+            }}));
+        }}
+        public override IEventTransferScope CreateScope(object instance)
+        {{
+            return new {scopeClassName}(this,instance);
+        }}
+";
+                }
 
                 var str = $@"
     {GenHeaders.AttackAttribute}
-    {visibility} sealed class {ssr}:StaticReflection.EventTransfer, StaticReflection.IEventDefine
+    {visibility} sealed class {ssr}: {implInterface}StaticReflection.IEventDefine
     {{
         public static readonly {ssr} Instance = new {ssr}();
-
+        
+        {additionClass}
+        
         private {ssr}(){{ }}
 
         public System.String Name {{ get; }} = ""{@event.Name}"";
@@ -87,22 +153,7 @@ namespace StaticReflection.CodeGen.Generators
         public System.Collections.Generic.IReadOnlyList<System.Attribute> Attributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", attributeStrs)} }};
 
         public System.Collections.Generic.IReadOnlyList<System.Type> ArgumentTypes {{ get; }} = new System.Type[] {{ {string.Join(",", delegateInvokeMethod.Parameters.Select(x=>$"typeof({x.Type.ToString().TrimEnd('?')})"))} }};
-
-        protected override void OnStart(object instance)
-        {{
-            (({targetType})instance).{@event.Name}+=OnEventRaise;
-        }}
-        protected override void OnStop(object instance)
-        {{
-            (({targetType})instance).{@event.Name}-=OnEventRaise;
-        }}
-        private void OnEventRaise({string.Join(",", delegateInvokeMethod.Parameters.Select(x=>$"{x.Type} {x.Name}"))})
-        {{
-            OnEventTransfed(new StaticReflection.EventTransferEventArgs(new System.Object[]
-            {{
-                {string.Join(",", delegateInvokeMethod.Parameters.Select(x=>x.Name))}
-            }}));
-        }}
+        {implMethods}
     }}";
                 scriptBuilder.AppendLine(str);
             }
