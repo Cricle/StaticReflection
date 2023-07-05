@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace StaticReflection.CodeGen.Generators
@@ -68,28 +69,9 @@ namespace StaticReflection.CodeGen.Generators
             {
                 var ssr = name + index + "CReflection";
                 index++;
-                var attributeStrs = GetAttributeStrings(constructor.GetAttributes());
 
-                var interfaceName = string.Empty;
-                var interfaceImpl = string.Empty;
-                if (IsAvaliableVisibility(constructor))
-                {
-
-                }
                 types.Add(ssr);
-                var str = $@"
-    {GenHeaders.AttackAttribute}
-    {visibility} sealed class {ssr} : StaticReflection.IConstructorDefine{interfaceName}
-    {{
-        public static readonly {ssr} Instance = new {ssr}();
-
-        private {ssr}(){{ }}
-
-        {CreateSymbolProperties(constructor)}
-        {CreateMethodProperies(targetType.ToString(), constructor)}
-        {interfaceImpl}
-    }}
-";
+                var str = BuildPropertyClass(ssr, targetType, constructor);
                 scriptBuilder.AppendLine(str);
             }
 

@@ -4,6 +4,7 @@ using System.Reflection;
 
 namespace StaticReflection.Benchmark.Actions
 {
+
     [MemoryDiagnoser]
     public class PropertyWrite
     {

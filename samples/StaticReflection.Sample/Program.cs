@@ -23,7 +23,10 @@ namespace StaticReflection.Sample
             a.Raise(new B {  S=22});
             foreach (var item in C.Default.Types[0].Constructors)
             {
-                Console.WriteLine(item.Name);
+                if (item.ArgumentTypes.Count == 0)
+                {
+                    Console.WriteLine(item.InvokeMethod(null));
+                }
             }
         }
 
