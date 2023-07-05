@@ -23,6 +23,7 @@ namespace StaticReflection.Sample
                 scope.Stop();
                 a.Raise(new B { S = 22 });
             }
+            var wprop = AReflection.Instance.Properties.FirstOrDefault(x => x.Name == "W");
             //ABxEReflection.Instance.Start(a);
             //ABxEReflection.Instance.EventTransfed += Instance_EventTransfed;
             //foreach (var item in C.Default.Types[0].Constructors)
@@ -67,6 +68,9 @@ namespace StaticReflection.Sample
         public int S { get; set; }
 
         public int Fi;
+
+        [DefaultValue(12)]
+        private int W { get; set; }
 
         public event EventHandler<B> Bx;
 

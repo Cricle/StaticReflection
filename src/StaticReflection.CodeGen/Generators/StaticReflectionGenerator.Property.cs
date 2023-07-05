@@ -12,7 +12,7 @@ namespace StaticReflection.CodeGen.Generators
         protected List<string> ExecuteProperty(SourceProductionContext context, GeneratorTransformResult<ISymbol> node,INamedTypeSymbol targetType)
         {
             var members = targetType.GetMembers();
-            var properyies = members.OfType<IPropertySymbol>().Where(x => !x.IsIndexer&&(x.DeclaredAccessibility== Accessibility.Public||x.DeclaredAccessibility== Accessibility.Internal||x.DeclaredAccessibility== Accessibility.ProtectedAndInternal)).ToList();
+            var properyies = members.OfType<IPropertySymbol>().Where(x => !x.IsIndexer).ToList();
             if (properyies.Count == 0)
             {
                 return new List<string>(0);

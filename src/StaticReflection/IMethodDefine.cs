@@ -6,6 +6,12 @@
 
         StaticMethodKind MethodKind { get; }
 
+        StaticRefKind RefKind { get; }
+
+        StaticNullableAnnotation ReturnNullableAnnotation { get; }
+
+        StaticNullableAnnotation ReceiverNullableAnnotation { get; }
+
         IReadOnlyList<Type> ArgumentTypes { get; }
 
         bool IsGenericMethod { get; }
@@ -37,5 +43,7 @@
         bool IsConditional { get; }
 
         IReadOnlyList<ITypeArgumentDefine> TypeArguments { get; }
+
+        IReadOnlyList<Attribute> ReturnTypeAttributes { get; }
     }
 }

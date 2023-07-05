@@ -94,7 +94,13 @@ unsafe
         
         public System.Boolean ReturnsByRef {{ get; }} = {BoolToString(method.ReturnsByRef)};        
 
-        public StaticReflection.StaticMethodKind MethodKind {{ get; }} = StaticMethodKind.{method.MethodKind};        
+        public StaticReflection.StaticMethodKind MethodKind {{ get; }} = StaticReflection.StaticMethodKind.{method.MethodKind};  
+
+        public StaticReflection.StaticRefKind RefKind {{ get; }} = StaticReflection.StaticRefKind.{method.RefKind};        
+
+        public StaticReflection.StaticNullableAnnotation ReturnNullableAnnotation {{ get; }} = StaticReflection.StaticNullableAnnotation.{method.ReturnNullableAnnotation};        
+
+        public StaticReflection.StaticNullableAnnotation ReceiverNullableAnnotation {{ get; }} = StaticReflection.StaticNullableAnnotation.{method.ReceiverNullableAnnotation};        
  
         public System.Boolean ReturnsByRefReadonly {{ get; }} = {BoolToString(method.ReturnsByRefReadonly)};        
 
@@ -127,6 +133,9 @@ unsafe
         public System.Boolean IsConditional {{ get; }} = {BoolToString(method.IsConditional)};     
         
         public System.Collections.Generic.IReadOnlyList<StaticReflection.ITypeArgumentDefine> TypeArguments {{ get; }} = new StaticReflection.ITypeArgumentDefine[] {{ {string.Join(",", typePars)} }};      
+
+        public System.Collections.Generic.IReadOnlyList<System.Attribute> ReturnTypeAttributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", GetAttributeStrings(method.GetReturnTypeAttributes()))} }};
+
 ";
         }
         private string BuildPropertyClass(string name,INamedTypeSymbol targetType, IMethodSymbol method)
