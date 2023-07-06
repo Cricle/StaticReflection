@@ -64,7 +64,8 @@ namespace StaticReflection.Benchmark.Actions
             object obji = 1;
             for (int i = 0; i < LoopCount; i++)
             {
-                StudentReflection.StudentGoT0P0MReflection.Instance.InvokeMethod(ostudent, obji);
+                //M(ostudent, obji);
+                StudentReflection.StudentGoT0P0MReflection.Instance.InvokeUsualMethod(ostudent, obji);
             }
         }
     }

@@ -19,11 +19,11 @@ namespace StaticReflection.Sample
             {
                 scope.Start();
                 scope.EventTransfed += Instance_EventTransfed;
-                a.Raise(new B { S = 22 });
+                //a.Raise(new B { S = 22 });
+                AReflection.Instance.InvokeUsualMethod("Raise", a, new B { S = 22 });
                 scope.Stop();
                 a.Raise(new B { S = 22 });
             }
-            var wprop = AReflection.Instance.Properties.FirstOrDefault(x => x.Name == "W");
             //ABxEReflection.Instance.Start(a);
             //ABxEReflection.Instance.EventTransfed += Instance_EventTransfed;
             //foreach (var item in C.Default.Types[0].Constructors)
@@ -72,7 +72,7 @@ namespace StaticReflection.Sample
         [DefaultValue(12)]
         private int W { get; set; }
 
-        public event EventHandler<B> Bx;
+        public event EventHandler<B>? Bx;
 
         public void Raise(B b)
         {
@@ -82,6 +82,5 @@ namespace StaticReflection.Sample
     [StaticReflectionAssembly]
     public partial class C
     {
-
     }
 }

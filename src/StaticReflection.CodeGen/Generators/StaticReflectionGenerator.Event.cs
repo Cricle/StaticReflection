@@ -108,7 +108,7 @@ namespace StaticReflection.CodeGen.Generators
 
         public System.String Name {{ get; }} = ""{@event.Name}"";
 
-        public System.Type DeclareType {{ get; }} = typeof({targetType});
+        public System.Type DeclareType {{ get; }} = typeof({targetType.ToString().TrimEnd('?')});
 
         public System.String MetadataName {{ get; }} = ""{@event.MetadataName}"";
 
@@ -138,7 +138,7 @@ namespace StaticReflection.CodeGen.Generators
         
         public System.Boolean IsInternal {{ get; }} = {BoolToString(@event.DeclaredAccessibility == Accessibility.Internal || @event.DeclaredAccessibility == Accessibility.ProtectedAndInternal)};
         
-        public System.Type DelegateType {{ get; }} = typeof({@event.Type});
+        public System.Type DelegateType {{ get; }} = typeof({@event.Type.ToString().TrimEnd('?')});
 
         public System.Boolean IsWindowsRuntimeEvent {{ get; }} = {BoolToString(@event.IsWindowsRuntimeEvent)};    
 
