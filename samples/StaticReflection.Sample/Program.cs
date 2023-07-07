@@ -1,62 +1,46 @@
 ﻿using StaticReflection.Annotions;
-using System.ComponentModel;
 
-[assembly: StaticReflection(Type = typeof(StaticReflection.Sample.A))]
 namespace StaticReflection.Sample
 {
     internal class Program
     {
-        [StaticReflection(Type =typeof(B))]
-        public A a { get; set; }
-
         static void Main(string[] args)
         {
-            var attrs = AReflection.Instance.Attributes;
+            var b=new Student();
+            var @class=C.Default.Types.First(x => x.Name == "Student");
+            @class.SetProperty(b, "Id", 1);
+            Console.WriteLine("Id: "+@class.GetProperty(b, "Id"));
+            var @event = (IEventTransfer)@class.Events.First(x => x.Name == "AlreadyGoSchool");
+            using (var eventScope = @event.CreateScope(b))
+            {
+                eventScope.Start();
+                eventScope.EventTransfed += Instance_EventTransfed;
+                var method = @class.Methods.First(x => x.Name == "GoToSchool");
+                Console.WriteLine("GoToSchool:" + method.InvokeUsualMethod(b));
+            }
+            var obj = @class.Constructors.First(x => x.ArgumentTypes.Count == 0);
+            var inst = obj.InvokeUsualMethod(null);
+            Console.WriteLine(inst);
         }
 
         private static void Instance_EventTransfed(object? sender, EventTransferEventArgs e)
         {
-            foreach (var item in e.Args)
-            {
-                Console.WriteLine(item);
-            }
+            Console.WriteLine("EventRaise: " + e.Args[0]);
         }
     }
-
-    public record class B
+    [StaticReflection]
+    public record class Student
     {
-        public int S { get; set; }
+        public int Id { get; set; }
 
-        public double Hello1 { get; set; }
+        public string? Name { get; set; }
 
-        public double Well1 { get; set; }
-    }
-    [DataObject(false)]
-    public class A
-    {
-        public A()
+        public event EventHandler<Student>? AlreadyGoSchool;
+
+        public int GoToSchool()
         {
-
-        }
-        [AmbientValue("aa")]
-        public A(int s)
-        {
-
-        }
-
-        [DefaultValue(12)]
-        public int S { get; set; }
-
-        public int Fi;
-
-        [DefaultValue(12)]
-        private int W { get; set; }
-
-        public event EventHandler<B>? Bx;
-
-        public void Raise(B b)
-        {
-            Bx?.Invoke(this, b);
+            AlreadyGoSchool?.Invoke(this, this);
+            return Id;
         }
     }
     [StaticReflectionAssembly]

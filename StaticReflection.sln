@@ -13,7 +13,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StaticReflection.Sample", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{8C2E1505-692C-4B05-BB25-DA87403E9DA3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StaticReflection.Benchmark", "test\StaticReflection.Benchmark\StaticReflection.Benchmark.csproj", "{3A0DC8B7-C6BE-4005-9987-4EDEBCF4D438}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StaticReflection.Benchmark", "test\StaticReflection.Benchmark\StaticReflection.Benchmark.csproj", "{3A0DC8B7-C6BE-4005-9987-4EDEBCF4D438}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solutions", "Solutions", "{A37E6253-AB6B-40A1-BCB3-9016981CEA37}"
+	ProjectSection(SolutionItems) = preProject
+		eng\pkg.props = eng\pkg.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,0 +1,15 @@
+<Project>
+	<PropertyGroup>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Version>1.0.0-preview.1</Version>
+		<Authors>HCricle</Authors>
+		<Description>A static reflection</Description>
+		<PackageProjectUrl>https://github.com/Cricle/StaticReflection</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/Cricle/StaticReflection</RepositoryUrl>
+		<Description>Use roslyn to make relection static, autogen code for type reflection</Description>
+		<PackageTags>roslyn,reflection,static</PackageTags>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	</PropertyGroup>
+</Project>
