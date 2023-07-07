@@ -21,7 +21,7 @@ namespace StaticReflection.Benchmark
             AddLogger(BenchmarkDotNet.Loggers.ConsoleLogger.Unicode);
             AddJob(Job.ShortRun.WithPlatform(Platform.X64).WithGcServer(true).WithRuntime(CoreRuntime.Core70));
             AddJob(Job.ShortRun.WithPlatform(Platform.X64).WithGcServer(true).WithRuntime(NativeAotRuntime.Net70).WithId("AOT"));
-            AddExporter(BenchmarkDotNet.Exporters.DefaultExporters.Markdown);
+            AddExporter(BenchmarkDotNet.Exporters.MarkdownExporter.GitHub);
             AddExporter(BenchmarkDotNet.Exporters.DefaultExporters.Csv);
             AddAnalyser(EnvironmentAnalyser.Default
                 , OutliersAnalyser.Default
