@@ -48,8 +48,9 @@ namespace StaticReflection.Benchmark.Actions
         [Benchmark]
         public void ReflectionCall()
         {
+            var args = new object[] { 1 };
             for (int i = 0; i < LoopCount; i++)
-                methodInfo.Invoke(student, new object[] { 1 });
+                methodInfo.Invoke(student, args);
         }
         [Benchmark]
         public void ExpressionCall()
@@ -64,9 +65,13 @@ namespace StaticReflection.Benchmark.Actions
             object obji = 1;
             for (int i = 0; i < LoopCount; i++)
             {
-                //M(ostudent, obji);
-                StudentReflection.StudentGoT0P0MReflection.Instance.InvokeUsualMethod(ostudent, obji);
+                //InvokeUsual(student, 1);
+                StudentReflection.StudentGoT0P0MReflection.Instance.InvokeUsualAnonymous(student, obji);
             }
+        }
+        void InvokeUsual(Student instance, int arg0)
+        {
+            instance.Go((int)(arg0));
         }
     }
 }

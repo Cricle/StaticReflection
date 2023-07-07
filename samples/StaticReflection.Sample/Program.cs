@@ -1,9 +1,7 @@
 ﻿using StaticReflection.Annotions;
-using System.Diagnostics;
 using System.ComponentModel;
-using System.Text.Json.Serialization;
 
-[assembly:StaticReflection(Type= typeof(StaticReflection.Sample.A))]
+[assembly: StaticReflection(Type = typeof(StaticReflection.Sample.A))]
 namespace StaticReflection.Sample
 {
     internal class Program
@@ -13,26 +11,7 @@ namespace StaticReflection.Sample
 
         static void Main(string[] args)
         {
-            var a=new A();
-            var evS = ((IEventTransfer)AReflection.Instance.Events[0]);
-            using (var scope=evS.CreateScope(a))
-            {
-                scope.Start();
-                scope.EventTransfed += Instance_EventTransfed;
-                //a.Raise(new B { S = 22 });
-                AReflection.Instance.InvokeUsualMethod("Raise", a, new B { S = 22 });
-                scope.Stop();
-                a.Raise(new B { S = 22 });
-            }
-            //ABxEReflection.Instance.Start(a);
-            //ABxEReflection.Instance.EventTransfed += Instance_EventTransfed;
-            //foreach (var item in C.Default.Types[0].Constructors)
-            //{
-            //    if (item.ArgumentTypes.Count == 0)
-            //    {
-            //        Console.WriteLine(item.InvokeMethod(null));
-            //    }
-            //}
+            var attrs = AReflection.Instance.Attributes;
         }
 
         private static void Instance_EventTransfed(object? sender, EventTransferEventArgs e)
@@ -52,6 +31,7 @@ namespace StaticReflection.Sample
 
         public double Well1 { get; set; }
     }
+    [DataObject(false)]
     public class A
     {
         public A()

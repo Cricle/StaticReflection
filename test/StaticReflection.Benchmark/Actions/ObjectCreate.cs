@@ -48,7 +48,7 @@ namespace StaticReflection.Benchmark.Actions
         {
             for (int i = 0; i < LoopCount; i++)
             {
-                c.Invoke(null);
+                Student s = (Student)c.InvokeUsualAnonymous(null);
             }
         }
     }

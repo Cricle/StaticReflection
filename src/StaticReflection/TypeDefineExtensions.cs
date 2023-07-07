@@ -220,7 +220,7 @@ namespace StaticReflection
         }
         public static object? InvokeMethod(this ITypeDefine typeDefine, string name, object? instance, params object?[] args)
         {
-            var method = typeDefine.Methods.FirstOrDefault(x => x.Name == name);
+            var method = typeDefine.Methods.FirstOrDefault(x => x.Name == name && x.ArgumentTypes.Count == args.Length);
             if (method == null)
             {
                 throw new InvalidOperationException($"Type {typeDefine.Name} has not method {name}");
@@ -229,7 +229,7 @@ namespace StaticReflection
         }
         public static object? InvokeUsualMethod(this ITypeDefine typeDefine, string name, object? instance, params object?[] args)
         {
-            var method = typeDefine.Methods.FirstOrDefault(x => x.Name == name);
+            var method = typeDefine.Methods.FirstOrDefault(x => x.Name == name && x.ArgumentTypes.Count == args.Length);
             if (method == null)
             {
                 throw new InvalidOperationException($"Type {typeDefine.Name} has not method {name}");
