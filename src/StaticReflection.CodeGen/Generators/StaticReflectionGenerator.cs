@@ -250,7 +250,7 @@ namespace {nameSpace}
 namespace {nameSpace}
 {{
     {GenHeaders.AttackAttribute}
-    {visibility} sealed class {ssr} : ITypeDefine
+    {visibility} sealed class {ssr} : StaticReflection.ITypeDefine
     {{
         {sourceScript}
         

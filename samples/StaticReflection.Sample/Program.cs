@@ -1,6 +1,7 @@
 ﻿using StaticReflection.Annotions;
+using StaticReflection;
 
-namespace StaticReflection.Sample
+namespace WW
 {
     internal class Program
     {

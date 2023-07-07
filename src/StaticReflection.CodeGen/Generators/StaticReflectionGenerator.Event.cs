@@ -51,7 +51,7 @@ namespace StaticReflection.CodeGen.Generators
     {GenHeaders.AttackAttribute}
     {visibility} sealed class {scopeName}:StaticReflection.EventTransferScope
     {{
-        public {scopeName}(IEventTransfer root, object? instance)
+        public {scopeName}(StaticReflection.IEventTransfer root, System.Object? instance)
             :base(root,instance)
         {{
         }}
@@ -89,7 +89,7 @@ namespace StaticReflection.CodeGen.Generators
                 {string.Join(",", delegateInvokeMethod.Parameters.Select(x => x.Name))}
             }}));
         }}
-        public override IEventTransferScope CreateScope(object instance)
+        public override StaticReflection.IEventTransferScope CreateScope(System.Object instance)
         {{
             return new {scopeClassName}(this,instance);
         }}
