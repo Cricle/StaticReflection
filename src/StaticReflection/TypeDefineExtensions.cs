@@ -4,6 +4,26 @@ namespace StaticReflection
 {
     public static class TypeDefineExtensions
     {
+        public static ITypeDefine? FindType(this IAssemblyDefine assembly,string typeName)
+        {
+            return assembly.Types.FirstOrDefault(x => x.Name == typeName);
+        }
+        public static IEventDefine? FindEvent(this ITypeDefine type,string eventName)
+        {
+            return type.Events.FirstOrDefault(x => x.Name == eventName);
+        }
+        public static IEventTransfer? FindEventTransfer(this ITypeDefine type, string eventName)
+        {
+            return (IEventTransfer?)type.Events.FirstOrDefault(x => x is IEventTransfer && x.Name == eventName);
+        }
+        public static IMethodDefine? FindMethod(this ITypeDefine type, string methodName)
+        {
+            return (IMethodDefine?)type.Methods.FirstOrDefault(x => x.Name == methodName);
+        }
+        public static IConstructorDefine? FindEmptyConstructor(this ITypeDefine type)
+        {
+            return (IConstructorDefine?)type.Constructors.FirstOrDefault(x => x.ArgumentTypes.Count == 0);
+        }
         public static void SetProperty(this ITypeDefine typeDefine, object? instance, string name, object? value)
         {
             GetPropertyAnonymousInvoke(typeDefine, name).SetValueAnonymous(instance, value);

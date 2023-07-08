@@ -8,18 +8,18 @@ namespace WW
         static void Main(string[] args)
         {
             var b=new Student();
-            var @class=C.Default.Types.First(x => x.Name == "Student");
+            var @class = C.Default.FindType("Student")!;
             @class.SetProperty(b, "Id", 1);
             Console.WriteLine("Id: "+@class.GetProperty(b, "Id"));
-            var @event = (IEventTransfer)@class.Events.First(x => x.Name == "AlreadyGoSchool");
+            var @event = @class.FindEventTransfer("AlreadyGoSchool")!;
             using (var eventScope = @event.CreateScope(b))
             {
                 eventScope.Start();
                 eventScope.EventTransfed += Instance_EventTransfed;
-                var method = @class.Methods.First(x => x.Name == "GoToSchool");
+                var method = @class.FindMethod("GoToSchool")!;
                 Console.WriteLine("GoToSchool:" + method.InvokeUsualMethod(b));
             }
-            var obj = @class.Constructors.First(x => x.ArgumentTypes.Count == 0);
+            var obj = @class.FindEmptyConstructor();
             var inst = obj.InvokeUsualMethod(null);
             Console.WriteLine(inst);
         }
