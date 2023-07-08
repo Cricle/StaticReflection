@@ -252,8 +252,8 @@ namespace {nameSpace}
     {GenHeaders.AttackAttribute}
     {visibility} sealed class {ssr} : StaticReflection.ITypeDefine
     {{
-        {sourceScript}
-        
+        {sourceScript}        
+
         public static readonly {ssr} Instance = new {ssr}();
 
         public System.Type DeclareType {{ get; }} = typeof({nameTypeTarget});
@@ -287,6 +287,34 @@ namespace {nameSpace}
         public System.Boolean IsProtected {{ get; }} = {BoolToString(nameTypeTarget.DeclaredAccessibility == Accessibility.Protected || nameTypeTarget.DeclaredAccessibility == Accessibility.ProtectedAndInternal)};
         
         public System.Boolean IsInternal {{ get; }} = {BoolToString(nameTypeTarget.DeclaredAccessibility == Accessibility.Internal || nameTypeTarget.DeclaredAccessibility == Accessibility.ProtectedAndInternal)};
+
+        public System.Type? BaseType {{ get; }} = {(nameTypeTarget.BaseType==null?"null":"typeof("+nameTypeTarget.ToString()+ ")")};
+
+        public System.Boolean IsReferenceType {{ get; }} = {BoolToString(nameTypeTarget.IsReferenceType)};
+
+        public System.Boolean IsValueType {{ get; }} = {BoolToString(nameTypeTarget.IsValueType)};
+
+        public System.Boolean IsAnonymousType {{ get; }} = {BoolToString(nameTypeTarget.IsAnonymousType)};
+
+        public System.Boolean IsTupleType {{ get; }} = {BoolToString(nameTypeTarget.IsTupleType)};
+
+        public System.Boolean IsNativeIntegerType {{ get; }} = {BoolToString(nameTypeTarget.IsNativeIntegerType)};
+
+        public System.Boolean IsRefLikeType {{ get; }} = {BoolToString(nameTypeTarget.IsRefLikeType)};
+
+        public System.Boolean IsUnmanagedType {{ get; }} = {BoolToString(nameTypeTarget.IsUnmanagedType)};
+
+        public System.Boolean IsReadOnly {{ get; }} = {BoolToString(nameTypeTarget.IsReadOnly)};
+
+        public System.Boolean IsRecord {{ get; }} = {BoolToString(nameTypeTarget.IsRecord)};
+        
+        public System.Int32 TypeKind {{ get; }} = {(int)nameTypeTarget.TypeKind};
+
+        public StaticReflection.StaticNullableAnnotation NullableAnnotation {{ get; }} = StaticReflection.StaticNullableAnnotation.{nameTypeTarget.NullableAnnotation};        
+
+        public System.Collections.Generic.IReadOnlyList<System.String> Interfaces {{ get; }} = new System.String[] {{ {string.Join(",", nameTypeTarget.Interfaces.Select(x => $"\"{x}\""))} }};
+        
+        public System.Collections.Generic.IReadOnlyList<System.String> AllInterfaces {{ get; }} = new System.String[] {{ {string.Join(",", nameTypeTarget.AllInterfaces.Select(x => $"\"{x}\""))} }};
 
         public System.Collections.Generic.IReadOnlyList<System.Attribute> Attributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", attributeStrs)} }};
 
