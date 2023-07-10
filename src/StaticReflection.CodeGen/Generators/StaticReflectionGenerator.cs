@@ -113,10 +113,13 @@ namespace StaticReflection.CodeGen.Generators
             var assemblySymbol = targetType.ContainingAssembly;
             if (ca!=null)
             {
-                var selectAssembly = allSymbols.FirstOrDefault(x => x.ToString() == ca);
+                var selectAssembly = allSymbols.FirstOrDefault(x => x?.ToString() == ca);
                 if (selectAssembly==null)
                 {
-                    //TODO: error
+                    context.ReportDiagnostic(Diagnostic.Create(DiagnosticMessages.NoAssemblyFoundDiagnostic,
+                        targetType.Locations[0],
+                        new object[] {ca}));
+                    return;
                 }
                 else
                 {
