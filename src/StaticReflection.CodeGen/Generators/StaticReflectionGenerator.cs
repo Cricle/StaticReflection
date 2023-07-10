@@ -92,6 +92,12 @@ namespace StaticReflection.CodeGen.Generators
         {
             return b ? "true" : "false";
         }
+        private void ReportAssemblyNotFound(SourceProductionContext context,Location location,string assembly)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(DiagnosticMessages.NoAssemblyFoundDiagnostic,
+                        location,
+                        new object[] { assembly }));
+        }
         protected void ExecuteAssembly(SourceProductionContext context, GeneratorTransformResult<ISymbol> node)
         {
             var targetType = node.SyntaxContext.TargetSymbol;
@@ -107,26 +113,36 @@ namespace StaticReflection.CodeGen.Generators
             {
                 withDefault = $"public static {name} Default {{ get; }} = new {name}();";
             }
-            var ca = attr?.NamedArguments.FirstOrDefault(x => x.Key == StaticReflectionAssemblyAttributeConsts.AssemblyFullName).Value.Value as string;
+            var assemblyFullName = attr?.NamedArguments.FirstOrDefault(x => x.Key == StaticReflectionAssemblyAttributeConsts.AssemblyFullName).Value.Value as string;
+            var assemblyName = attr?.NamedArguments.FirstOrDefault(x => x.Key == StaticReflectionAssemblyAttributeConsts.AssemblyName).Value.Value as string;
             var refs = node.SyntaxContext.SemanticModel.Compilation.GetUsedAssemblyReferences(context.CancellationToken);
             var allSymbols = refs.Select(node.SyntaxContext.SemanticModel.Compilation.GetAssemblyOrModuleSymbol).ToList();
             var assemblySymbol = targetType.ContainingAssembly;
-            if (ca!=null)
+            if (assemblyFullName!=null)
             {
-                var selectAssembly = allSymbols.FirstOrDefault(x => x?.ToString() == ca);
+                var selectAssembly = allSymbols.FirstOrDefault(x => x?.ToString() == assemblyFullName);
                 if (selectAssembly==null)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(DiagnosticMessages.NoAssemblyFoundDiagnostic,
-                        targetType.Locations[0],
-                        new object[] {ca}));
+                    ReportAssemblyNotFound(context, targetType.Locations[0],assemblyFullName);
                     return;
                 }
                 else
                 {
                     assemblySymbol = (IAssemblySymbol)selectAssembly;
                 }
-                //assemblySymbol = (IAssemblySymbol)node.SyntaxContext.SemanticModel.Compilation.GetAssemblyOrModuleSymbol(refs[0]);
-
+            }
+            else if (assemblyName!=null)
+            {
+                var selectAssembly = allSymbols.FirstOrDefault(x => x?.Name == assemblyName);
+                if (selectAssembly == null)
+                {
+                    ReportAssemblyNotFound(context, targetType.Locations[0], assemblyName);
+                    return;
+                }
+                else
+                {
+                    assemblySymbol = (IAssemblySymbol)selectAssembly;
+                }
             }
             var assemblyIdentity = assemblySymbol.Identity;
             var assemblyNameSpace = assemblySymbol.GlobalNamespace;

@@ -46,7 +46,7 @@ namespace WW
             return Id;
         }
     }
-    [StaticReflectionAssembly(AssemblyFullName = "Microsoft.VisualBasic.Core, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a")]
+    [StaticReflectionAssembly(AssemblyName = "Microsoft.VisualBasic.Core")]
     public partial class C
     {
     }
