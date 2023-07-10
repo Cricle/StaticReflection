@@ -4,7 +4,7 @@
     {
         event EventHandler<EventTransferEventArgs> EventTransfed;
     }
-    public interface IEventTransfer: IEventBearing
+    public interface IEventTransfer : IEventBearing
     {
         bool IsListening { get; }
 
@@ -15,7 +15,7 @@
         IEventTransferScope CreateScope(object? instance);
     }
 
-    public interface IEventTransferScope: IEventBearing,IDisposable
+    public interface IEventTransferScope : IEventBearing, IDisposable
     {
         IEventTransfer Root { get; }
 

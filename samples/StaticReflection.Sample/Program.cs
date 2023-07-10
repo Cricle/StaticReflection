@@ -1,5 +1,5 @@
-﻿using StaticReflection.Annotions;
-using StaticReflection;
+﻿using StaticReflection;
+using StaticReflection.Annotions;
 
 namespace WW
 {
@@ -7,12 +7,12 @@ namespace WW
     {
         static void Main(string[] args)
         {
-            var b=new Student();
+            var b = new Student();
             var ss = typeof(Student).FindStaticAssembly();
             Console.WriteLine(ss?.AssemblyFullName);
             var @class = C.Default.FindType("Student")!;
             @class.SetProperty(b, "Id", 1);
-            Console.WriteLine("Id: "+@class.GetProperty(b, "Id"));
+            Console.WriteLine("Id: " + @class.GetProperty(b, "Id"));
             var @event = @class.FindEventTransfer("AlreadyGoSchool")!;
             using (var eventScope = @event.CreateScope(b))
             {

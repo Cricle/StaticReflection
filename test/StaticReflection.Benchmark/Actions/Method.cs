@@ -10,9 +10,9 @@ namespace StaticReflection.Benchmark.Actions
         public static readonly A Instance = new A();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Call<T>(Student student,ref T arg)
+        public void Call<T>(Student student, ref T arg)
         {
-            student.Go(Unsafe.As<T,int>(ref arg));
+            student.Go(Unsafe.As<T, int>(ref arg));
         }
     }
     [MemoryDiagnoser]
@@ -21,18 +21,18 @@ namespace StaticReflection.Benchmark.Actions
         private Student student;
         private object ostudent;
 
-        private Action<object,object> expression;
+        private Action<object, object> expression;
         private MethodInfo methodInfo;
 
         [GlobalSetup]
         public void Setup()
         {
-            ostudent=student = new Student();
+            ostudent = student = new Student();
             var par1 = Expression.Parameter(typeof(object));
             var par2 = Expression.Parameter(typeof(object));
-            expression = Expression.Lambda<Action<object,object>>(
+            expression = Expression.Lambda<Action<object, object>>(
                 Expression.Call(
-                        Expression.Convert(par1, typeof(Student)), typeof(Student).GetMethod(nameof(Student.Go)), Expression.Convert(par2, typeof(int))), par1,par2).Compile(preferInterpretation:true);
+                        Expression.Convert(par1, typeof(Student)), typeof(Student).GetMethod(nameof(Student.Go)), Expression.Convert(par2, typeof(int))), par1, par2).Compile(preferInterpretation: true);
             methodInfo = typeof(Student).GetMethod(nameof(Student.Go));
         }
 
@@ -56,7 +56,7 @@ namespace StaticReflection.Benchmark.Actions
         public void ExpressionCall()
         {
             for (int i = 0; i < LoopCount; i++)
-                expression(student,1);
+                expression(student, 1);
         }
 
         [Benchmark]

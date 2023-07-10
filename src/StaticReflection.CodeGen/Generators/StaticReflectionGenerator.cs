@@ -1,6 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using System.Diagnostics;
 using System.Text;
 
 namespace StaticReflection.CodeGen.Generators
@@ -73,7 +72,7 @@ namespace StaticReflection.CodeGen.Generators
             return symbol.GetAttributes()
                     .Any(x => x.AttributeClass?.ToString() == typeof(GeneratorAttribute).FullName);
         }
-        protected List<string> GetAttributeStrings(SemanticModel model,IEnumerable<AttributeData>? attributes)
+        protected List<string> GetAttributeStrings(SemanticModel model, IEnumerable<AttributeData>? attributes)
         {
             if (attributes == null || !attributes.Any())
             {
@@ -92,7 +91,7 @@ namespace StaticReflection.CodeGen.Generators
         {
             return b ? "true" : "false";
         }
-        private void ReportAssemblyNotFound(SourceProductionContext context,Location location,string assembly)
+        private void ReportAssemblyNotFound(SourceProductionContext context, Location location, string assembly)
         {
             context.ReportDiagnostic(Diagnostic.Create(DiagnosticMessages.NoAssemblyFoundDiagnostic,
                         location,
@@ -104,12 +103,12 @@ namespace StaticReflection.CodeGen.Generators
             var visibility = GetAccessibilityString(targetType.DeclaredAccessibility);
             var nameSpace = targetType.ContainingNamespace.ToString();
             var name = targetType.Name;
-            var staticKeyWorld = targetType.IsStatic?"static ":string.Empty;
+            var staticKeyWorld = targetType.IsStatic ? "static " : string.Empty;
             var withDefault = string.Empty;
             var attr = targetType.GetAttributes().FirstOrDefault(x => x.AttributeClass?.ToString() == StaticReflectionAssemblyAttributeConsts.Name);
-            if (attr!=null&&
-                (attr.NamedArguments.FirstOrDefault(x=>x.Key==StaticReflectionAssemblyAttributeConsts.WithDefaultName).Value.Value is bool b&&b||
-                !attr.NamedArguments.Any(x=>x.Key== StaticReflectionAssemblyAttributeConsts.WithDefaultName)))
+            if (attr != null &&
+                (attr.NamedArguments.FirstOrDefault(x => x.Key == StaticReflectionAssemblyAttributeConsts.WithDefaultName).Value.Value is bool b && b ||
+                !attr.NamedArguments.Any(x => x.Key == StaticReflectionAssemblyAttributeConsts.WithDefaultName)))
             {
                 withDefault = $"public static {name} Default {{ get; }} = new {name}();";
             }
@@ -118,12 +117,12 @@ namespace StaticReflection.CodeGen.Generators
             var refs = node.SyntaxContext.SemanticModel.Compilation.GetUsedAssemblyReferences(context.CancellationToken);
             var allSymbols = refs.Select(node.SyntaxContext.SemanticModel.Compilation.GetAssemblyOrModuleSymbol).ToList();
             var assemblySymbol = targetType.ContainingAssembly;
-            if (assemblyFullName!=null)
+            if (assemblyFullName != null)
             {
                 var selectAssembly = allSymbols.FirstOrDefault(x => x?.ToString() == assemblyFullName);
-                if (selectAssembly==null)
+                if (selectAssembly == null)
                 {
-                    ReportAssemblyNotFound(context, targetType.Locations[0],assemblyFullName);
+                    ReportAssemblyNotFound(context, targetType.Locations[0], assemblyFullName);
                     return;
                 }
                 else
@@ -131,7 +130,7 @@ namespace StaticReflection.CodeGen.Generators
                     assemblySymbol = (IAssemblySymbol)selectAssembly;
                 }
             }
-            else if (assemblyName!=null)
+            else if (assemblyName != null)
             {
                 var selectAssembly = allSymbols.FirstOrDefault(x => x?.Name == assemblyName);
                 if (selectAssembly == null)
@@ -147,24 +146,24 @@ namespace StaticReflection.CodeGen.Generators
             var assemblyIdentity = assemblySymbol.Identity;
             var assemblyNameSpace = assemblySymbol.GlobalNamespace;
 
-            var moduleDefines=new Dictionary<string, string>();
+            var moduleDefines = new Dictionary<string, string>();
 
             foreach (var item in assemblySymbol.Modules)
             {
-                var moduleName = $"{item.Name.Replace(".","_")}Module";
+                var moduleName = $"{item.Name.Replace(".", "_")}Module";
                 var script = $@"
 
 class {moduleName}:StaticReflection.IModuleIdentity
 {{
-    {CreateSymbolProperties(node.SyntaxContext.SemanticModel,item)}
+    {CreateSymbolProperties(node.SyntaxContext.SemanticModel, item)}
 
     public System.Type DeclareType {{ get; }} = null;
     
     public StaticReflection.INameSpaceIdentity GlobalNamespace {{ get; }} = {CreateNameSpaceIdentity(assemblyNameSpace)};
 
-    public System.Collections.Generic.IReadOnlyList<StaticReflection.IAssemblyIdentity> ReferencedAssemblies {{ get; }} = new StaticReflection.IAssemblyIdentity[]{{ {string.Join(",",item.ReferencedAssemblies.Select(CreateAssemblyIdentity))} }};
+    public System.Collections.Generic.IReadOnlyList<StaticReflection.IAssemblyIdentity> ReferencedAssemblies {{ get; }} = new StaticReflection.IAssemblyIdentity[]{{ {string.Join(",", item.ReferencedAssemblies.Select(CreateAssemblyIdentity))} }};
 
-    public System.Collections.Generic.IReadOnlyList<System.String> ReferencedAssemblySymbolNames {{ get; }} = new System.String[]{{ {string.Join(",",item.ReferencedAssemblySymbols.Select(x=>$"\"{x.Name}\"")) }}};
+    public System.Collections.Generic.IReadOnlyList<System.String> ReferencedAssemblySymbolNames {{ get; }} = new System.String[]{{ {string.Join(",", item.ReferencedAssemblySymbols.Select(x => $"\"{x.Name}\""))}}};
 }}
 ";
                 moduleDefines[moduleName] = script;
@@ -190,9 +189,9 @@ namespace {nameSpace}
         
         public StaticReflection.INameSpaceIdentity GlobalNamespace {{ get; }} = {CreateNameSpaceIdentity(assemblyNameSpace)};
         
-        public System.Collections.Generic.IReadOnlyList<StaticReflection.IModuleIdentity> Modules {{ get; }} = new StaticReflection.IModuleIdentity[] {{ {string.Join(",", moduleDefines.Keys.Select(x=>$"new {x}()"))} }};
+        public System.Collections.Generic.IReadOnlyList<StaticReflection.IModuleIdentity> Modules {{ get; }} = new StaticReflection.IModuleIdentity[] {{ {string.Join(",", moduleDefines.Keys.Select(x => $"new {x}()"))} }};
 
-        public System.Collections.Generic.IReadOnlyList<string> TypeNames {{ get; }}= new System.String[] {{ {string.Join(",",assemblySymbol.TypeNames.Select(x=>$"\"{x}\""))} }};
+        public System.Collections.Generic.IReadOnlyList<string> TypeNames {{ get; }}= new System.String[] {{ {string.Join(",", assemblySymbol.TypeNames.Select(x => $"\"{x}\""))} }};
 
         public System.Collections.Generic.IReadOnlyList<string> NamespaceNames {{ get; }}= new System.String[] {{ {string.Join(",", assemblySymbol.NamespaceNames.Select(x => $"\"{x}\""))} }};
 
@@ -202,11 +201,11 @@ namespace {nameSpace}
 
         public System.Collections.Generic.IReadOnlyList<StaticReflection.ITypeDefine> Types{{ get; }} = new System.Collections.Generic.List<StaticReflection.ITypeDefine>
         {{
-            {string.Join(",\n", (refTypes.TryGetValue(assemblySymbol.ToString(),out var lst)?lst:new HashSet<string>()).Distinct().Select(x=>x+".Instance"))}
+            {string.Join(",\n", (refTypes.TryGetValue(assemblySymbol.ToString(), out var lst) ? lst : new HashSet<string>()).Distinct().Select(x => x + ".Instance"))}
         }};
     }}
 }}
-"; 
+";
             var code = FormatCode(str);
             context.AddSource($"{name}.g.cs", code);
 
@@ -221,7 +220,7 @@ namespace {nameSpace}
         }
         private string BytesToString(IEnumerable<byte> bytes)
         {
-            return $"new System.Byte[]{{ {string.Join(",",bytes)} }}";
+            return $"new System.Byte[]{{ {string.Join(",", bytes)} }}";
         }
         protected void Execute(SourceProductionContext context, GeneratorTransformResult<ISymbol> node)
         {
@@ -229,18 +228,18 @@ namespace {nameSpace}
             if (node.Value != null)
             {
                 var processingedEmpty = false;
-                var processedType=new HashSet<string>();
+                var processedType = new HashSet<string>();
                 var attributes = targetType.GetAttributes().Where(x => x.AttributeClass?.ToString() == StaticReflectionAttributeConsts.Name).ToList();
                 foreach (var attr in attributes)
                 {
                     var attrType = (attr.NamedArguments.FirstOrDefault(x => x.Key == StaticReflectionAttributeConsts.TypeName).Value.Value as INamedTypeSymbol)?.OriginalDefinition;
                     targetType = attrType ?? targetType;
                     var newNode = new GeneratorTransformResult<ISymbol>(targetType, node.SyntaxContext);
-                    if (attrType != null&& processedType.Add(attrType.ToString()))
+                    if (attrType != null && processedType.Add(attrType.ToString()))
                     {
                         ExecuteOne(context, newNode, attr, attrType);
                     }
-                    else if(!processingedEmpty)
+                    else if (!processingedEmpty)
                     {
                         processingedEmpty = true;
                         ExecuteOne(context, newNode, attr, targetType!);
@@ -268,7 +267,7 @@ namespace {nameSpace}
             {
                 throw new NotSupportedException(targetType.GetType()?.FullName);
             }
-            var properties=ExecuteProperty(context, node, nameTypeTarget);
+            var properties = ExecuteProperty(context, node, nameTypeTarget);
             var methods = ExecuteMethods(context, node, nameTypeTarget);
             var events = ExecuteEvents(context, node, nameTypeTarget);
             var fields = ExecuteFields(context, node, nameTypeTarget);
@@ -278,13 +277,13 @@ namespace {nameSpace}
             var visibility = GetAccessibilityString(targetType.DeclaredAccessibility);
 
             var nameSpace = targetType.ContainingNamespace.ToString();
-            var attributeStrs = GetAttributeStrings(node.SyntaxContext.SemanticModel,targetType.GetAttributes());
+            var attributeStrs = GetAttributeStrings(node.SyntaxContext.SemanticModel, targetType.GetAttributes());
             var assemblyFullName = nameTypeTarget.ContainingAssembly.ToString();
-            if (!refTypes.TryGetValue(assemblyFullName,out var lst))
+            if (!refTypes.TryGetValue(assemblyFullName, out var lst))
             {
                 lst = new HashSet<string>();
             }
-            lst.Add(nameSpace+"."+ssr);
+            lst.Add(nameSpace + "." + ssr);
             var str = $@"
 {GenHeaders.AutoGenHead}
 #pragma warning disable CS9082
@@ -329,7 +328,7 @@ namespace {nameSpace}
         
         public System.Boolean IsInternal {{ get; }} = {BoolToString(nameTypeTarget.DeclaredAccessibility == Accessibility.Internal || nameTypeTarget.DeclaredAccessibility == Accessibility.ProtectedAndInternal)};
 
-        public System.Type? BaseType {{ get; }} = {(nameTypeTarget.BaseType==null?"null":"typeof("+nameTypeTarget.ToString()+ ")")};
+        public System.Type? BaseType {{ get; }} = {(nameTypeTarget.BaseType == null ? "null" : "typeof(" + nameTypeTarget.ToString() + ")")};
 
         public System.Boolean IsReferenceType {{ get; }} = {BoolToString(nameTypeTarget.IsReferenceType)};
 

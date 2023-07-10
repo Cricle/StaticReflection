@@ -1,6 +1,6 @@
 ﻿namespace StaticReflection
 {
-    public interface ITypeArgumentDefine: IUnderType
+    public interface ITypeArgumentDefine : IUnderType
     {
         bool HasReferenceTypeConstraint { get; }
 

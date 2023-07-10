@@ -39,13 +39,13 @@ namespace StaticReflection.Benchmark.Actions
         public void ReflectionCall()
         {
             for (int i = 0; i < LoopCount; i++)
-                propertyInfo.SetValue(student,i);
+                propertyInfo.SetValue(student, i);
         }
         [Benchmark]
         public void ExpressionCall()
         {
             for (int i = 0; i < LoopCount; i++)
-                expression(student,i);
+                expression(student, i);
         }
         [Benchmark]
 
@@ -53,7 +53,7 @@ namespace StaticReflection.Benchmark.Actions
         {
             for (int i = 0; i < LoopCount; i++)
             {
-                StudentReflection.StudentIdPReflection.Instance.SetValueAnonymous(student,i);
+                StudentReflection.StudentIdPReflection.Instance.SetValueAnonymous(student, i);
             }
         }
     }

@@ -1,15 +1,11 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis;
-using System;
-using System.Collections.Generic;
+﻿using Microsoft.CodeAnalysis;
 using System.Text;
-using System.Diagnostics;
 
 namespace StaticReflection.CodeGen.Generators
 {
     public partial class StaticReflectionGenerator
     {
-        protected List<string> ExecuteProperty(SourceProductionContext context, GeneratorTransformResult<ISymbol> node,INamedTypeSymbol targetType)
+        protected List<string> ExecuteProperty(SourceProductionContext context, GeneratorTransformResult<ISymbol> node, INamedTypeSymbol targetType)
         {
             var members = targetType.GetMembers();
             var properyies = members.OfType<IPropertySymbol>().Where(x => !x.IsIndexer).ToList();
@@ -36,7 +32,7 @@ namespace StaticReflection.CodeGen.Generators
                 var ssr = name + property.Name + "PReflection";
                 var attributeStrs = GetAttributeStrings(node.SyntaxContext.SemanticModel, property.GetAttributes());
                 var getBody = $"throw new System.InvalidOperationException(\"The property {targetType}.{property} is set only\");";
-                if ((!property.IsWriteOnly|| property.IsReadOnly) && avaVisi)
+                if ((!property.IsWriteOnly || property.IsReadOnly) && avaVisi)
                 {
                     if (property.IsStatic)
                     {
@@ -48,7 +44,7 @@ namespace StaticReflection.CodeGen.Generators
                     }
                 }
                 var setBody = $"throw new System.InvalidOperationException(\"The property {targetType}.{property} is read only\");";
-                if (!property.IsReadOnly&& avaVisi)
+                if (!property.IsReadOnly && avaVisi)
                 {
                     if (property.IsStatic)
                     {
@@ -114,7 +110,7 @@ namespace StaticReflection.CodeGen.Generators
  
         public System.Boolean ReturnsByRefReadonly {{ get; }} = {BoolToString(property.ReturnsByRefReadonly)};        
          
-        public System.Collections.Generic.IReadOnlyList<System.Attribute> GetterAttributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", GetAttributeStrings(node.SyntaxContext.SemanticModel,property.GetMethod?.GetAttributes()))} }};  
+        public System.Collections.Generic.IReadOnlyList<System.Attribute> GetterAttributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", GetAttributeStrings(node.SyntaxContext.SemanticModel, property.GetMethod?.GetAttributes()))} }};  
         
         public System.Collections.Generic.IReadOnlyList<System.Attribute> SetterAttributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", GetAttributeStrings(node.SyntaxContext.SemanticModel, property.SetMethod?.GetAttributes()))} }};  
 

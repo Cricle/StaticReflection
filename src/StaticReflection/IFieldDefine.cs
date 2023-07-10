@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace StaticReflection
+﻿namespace StaticReflection
 {
-    public interface IFieldDefine: IAttributeDefine, IMemberDefine
+    public interface IFieldDefine : IAttributeDefine, IMemberDefine
     {
         Type PropertyType { get; }
 

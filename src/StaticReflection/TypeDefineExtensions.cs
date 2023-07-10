@@ -13,7 +13,7 @@ namespace StaticReflection
         public static IAssemblyDefine? FindStaticAssembly(this Type type)
         {
             var assembly = type.Assembly;
-            if (!assemblyDefineMapper.TryGetValue(assembly,out var def))
+            if (!assemblyDefineMapper.TryGetValue(assembly, out var def))
             {
                 lock (findAssemblyLocker)
                 {
@@ -45,11 +45,11 @@ namespace StaticReflection
             return null;
         }
 
-        public static ITypeDefine? FindType(this IAssemblyDefine assembly,string typeName)
+        public static ITypeDefine? FindType(this IAssemblyDefine assembly, string typeName)
         {
             return assembly.Types.FirstOrDefault(x => x.Name == typeName);
         }
-        public static IEventDefine? FindEvent(this ITypeDefine type,string eventName)
+        public static IEventDefine? FindEvent(this ITypeDefine type, string eventName)
         {
             return type.Events.FirstOrDefault(x => x.Name == eventName);
         }

@@ -6,7 +6,7 @@
 
         string Name { get; }
     }
-    public interface IMemberDefine: IAttributeDefine, IUnderType
+    public interface IMemberDefine : IAttributeDefine, IUnderType
     {
         string MetadataName { get; }
 

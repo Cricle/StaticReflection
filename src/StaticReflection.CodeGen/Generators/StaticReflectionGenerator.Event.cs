@@ -1,7 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using System.Text;
-using System.Diagnostics;
 
 namespace StaticReflection.CodeGen.Generators
 {
@@ -10,8 +8,8 @@ namespace StaticReflection.CodeGen.Generators
         protected List<string> ExecuteEvents(SourceProductionContext context, GeneratorTransformResult<ISymbol> node, INamedTypeSymbol targetType)
         {
             var members = targetType.GetMembers();
-            var events = members.OfType<IEventSymbol>().Where(x=>x.Type is INamedTypeSymbol symbol&& IsAvaliableVisibility(x)&&symbol.DelegateInvokeMethod!=null).ToList();
-            if (events.Count==0)
+            var events = members.OfType<IEventSymbol>().Where(x => x.Type is INamedTypeSymbol symbol && IsAvaliableVisibility(x) && symbol.DelegateInvokeMethod != null).ToList();
+            if (events.Count == 0)
             {
                 return new List<string>(0);
             }
@@ -27,15 +25,15 @@ namespace StaticReflection.CodeGen.Generators
             foreach (var @event in events)
             {
                 var ssr = name + @event.Name + "EReflection";
-                var attributeStrs = GetAttributeStrings(node.SyntaxContext.SemanticModel,@event.GetAttributes());
+                var attributeStrs = GetAttributeStrings(node.SyntaxContext.SemanticModel, @event.GetAttributes());
                 var delegateInvokeMethod = ((INamedTypeSymbol)@event.Type).DelegateInvokeMethod!;
                 types.Add(ssr);
 
                 var implInterface = string.Empty;
                 var additionClass = string.Empty;
                 var implMethods = string.Empty;
-                if (IsAvaliableVisibility(@event)&&@event.AddMethod!=null&&@event.RemoveMethod!=null)
-                {                
+                if (IsAvaliableVisibility(@event) && @event.AddMethod != null && @event.RemoveMethod != null)
+                {
                     var scopeClassName = ssr + "Scope";//Static ?
                     var selectVisit = string.Empty;
                     if (@event.IsStatic)
@@ -152,7 +150,7 @@ namespace StaticReflection.CodeGen.Generators
 
         public System.Collections.Generic.IReadOnlyList<System.Attribute> Attributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", attributeStrs)} }};
 
-        public System.Collections.Generic.IReadOnlyList<System.Type> ArgumentTypes {{ get; }} = new System.Type[] {{ {string.Join(",", delegateInvokeMethod.Parameters.Select(x=>$"typeof({x.Type.ToString().TrimEnd('?')})"))} }};
+        public System.Collections.Generic.IReadOnlyList<System.Type> ArgumentTypes {{ get; }} = new System.Type[] {{ {string.Join(",", delegateInvokeMethod.Parameters.Select(x => $"typeof({x.Type.ToString().TrimEnd('?')})"))} }};
         {implMethods}
     }}";
                 scriptBuilder.AppendLine(str);

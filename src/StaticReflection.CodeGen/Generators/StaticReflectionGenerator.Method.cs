@@ -1,10 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using System.Text;
-using System.Diagnostics;
-using System.Security.Cryptography;
-using System.IO.Pipes;
-using System.Xml.Linq;
 
 namespace StaticReflection.CodeGen.Generators
 {
@@ -21,15 +16,15 @@ namespace StaticReflection.CodeGen.Generators
             out string unsafeScript)
         {
             argOutof16 = method.Parameters.Length > 16;
-            hasReturn = !method.ReturnsVoid||method.MethodKind== MethodKind.Constructor;
+            hasReturn = !method.ReturnsVoid || method.MethodKind == MethodKind.Constructor;
             implementInvokeInterface = ",";
-            returnType=method.MethodKind == MethodKind.Constructor?method.ContainingType.ToString() : method.ReturnType.ToString();
+            returnType = method.MethodKind == MethodKind.Constructor ? method.ContainingType.ToString() : method.ReturnType.ToString();
             unsafeScript = @"
 #if !NET7_0_OR_GREATER
 unsafe
 #endif
 ";
-            invokeNoRefImplement= "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]\n";
+            invokeNoRefImplement = "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]\n";
             invokeImplement = "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]\n";
             if (argOutof16)
             {
@@ -50,7 +45,7 @@ unsafe
                 {
                     implementInvokeInterface += $"StaticReflection.Invoking.IArgsMethod<{targetType},{returnType}>,StaticReflection.Invoking.IArgs{method.Parameters.Length}AnonymousMethod,StaticReflection.Invoking.IUsualArgsMethod<{targetType},{returnType}>,StaticReflection.Invoking.IUsualArgs{method.Parameters.Length}AnonymousMethod";
                     invokeImplement += $"public {unsafeScript} ref {returnType} Invoke({targetType} instance)";
-                    invokeNoRefImplement+= $"public {returnType} InvokeUsual({targetType} instance)";
+                    invokeNoRefImplement += $"public {returnType} InvokeUsual({targetType} instance)";
                 }
                 else
                 {
@@ -92,12 +87,12 @@ unsafe
                 }
                 if (!string.IsNullOrEmpty(usualImpl))
                 {
-                    implementInvokeInterface +="," +usualImpl;
+                    implementInvokeInterface += "," + usualImpl;
                 }
             }
         }
 
-        private string CreateMethodProperies(string targetType,IMethodSymbol method,SemanticModel model)
+        private string CreateMethodProperies(string targetType, IMethodSymbol method, SemanticModel model)
         {
             var typePars = new List<string>();
 
@@ -122,7 +117,7 @@ unsafe
  
         public System.Boolean ReturnsByRefReadonly {{ get; }} = {BoolToString(method.ReturnsByRefReadonly)};        
 
-        public System.Type ReturnType {{ get; }} = typeof({(method.MethodKind== MethodKind.Constructor?method.ContainingType: method.ReturnType)});     
+        public System.Type ReturnType {{ get; }} = typeof({(method.MethodKind == MethodKind.Constructor ? method.ContainingType : method.ReturnType)});     
 
         public System.Collections.Generic.IReadOnlyList<System.Type> ArgumentTypes {{ get; }} = new System.Type[]{{ {string.Join(",", method.Parameters.Select(x => $"typeof({x.Type.ToString().TrimEnd('?')})"))} }};        
          
@@ -156,18 +151,18 @@ unsafe
 
 ";
         }
-        private string BuildPropertyClass(string name,INamedTypeSymbol targetType, IMethodSymbol method,SemanticModel model)
+        private string BuildPropertyClass(string name, INamedTypeSymbol targetType, IMethodSymbol method, SemanticModel model)
         {
             var implementInvokeInterface = string.Empty;
             var invokeImplement = string.Empty;
             var invokeNoRefImplement = string.Empty;
 
-            if (!method.IsGenericMethod && IsAvaliableVisibility(method) || (method.MethodKind == MethodKind.Constructor && !method.IsStatic&& IsAvaliableVisibility(method)))
+            if (!method.IsGenericMethod && IsAvaliableVisibility(method) || (method.MethodKind == MethodKind.Constructor && !method.IsStatic && IsAvaliableVisibility(method)))
             {
                 GetMethodDefine(targetType,
-                    method, 
-                    out implementInvokeInterface, 
-                    out invokeImplement, 
+                    method,
+                    out implementInvokeInterface,
+                    out invokeImplement,
                     out invokeNoRefImplement,
                     out bool argOutof16,
                     out bool hasReturn,
@@ -208,7 +203,7 @@ unsafe
                 }
                 if (hasReturn)
                 {
-                    callNoRef = " return "+ callNoRef + ";";
+                    callNoRef = " return " + callNoRef + ";";
                     call = $@"
 ref {returnType} result = ref System.Runtime.CompilerServices.Unsafe.AsRef({call});
 return ref result;
@@ -347,8 +342,8 @@ public void InvokeUsualAnonymous(object instance{argNoRefStr})
 
         private {name}(){{ }}
 
-        {CreateSymbolProperties(model,method)}
-        {CreateMethodProperies(targetType.ToString(),method, model)}
+        {CreateSymbolProperties(model, method)}
+        {CreateMethodProperies(targetType.ToString(), method, model)}
         {invokeImplement}
         {invokeNoRefImplement}
     }}
@@ -359,9 +354,9 @@ public void InvokeUsualAnonymous(object instance{argNoRefStr})
         {
             var members = targetType.GetMembers();
             var methods = members.OfType<IMethodSymbol>()
-                .Where(x => (x.MethodKind == MethodKind.Ordinary) &&!x.IsGenericMethod && (!x.Name.StartsWith("<") || !x.Name.EndsWith("$")))
+                .Where(x => (x.MethodKind == MethodKind.Ordinary) && !x.IsGenericMethod && (!x.Name.StartsWith("<") || !x.Name.EndsWith("$")))
                 .ToList();
-            if (methods.Count==0)
+            if (methods.Count == 0)
             {
                 return new List<string>(0);
             }

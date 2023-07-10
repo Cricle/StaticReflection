@@ -1,10 +1,5 @@
 ﻿using StaticReflection.Annotions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StaticReflection.Benchmark
 {
@@ -28,7 +23,7 @@ namespace StaticReflection.Benchmark
     }
 
     [AttributeUsage(AttributeTargets.Property)]
-    public class PersonAttribute:Attribute
+    public class PersonAttribute : Attribute
     {
         public PersonAttribute(int a)
         {

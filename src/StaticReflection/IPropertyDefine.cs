@@ -13,7 +13,7 @@
         TResult GetValue(TInstance instance);
     }
     public interface IPropertyDefine : IAttributeDefine, IMemberDefine
-    {    
+    {
         Type PropertyType { get; }
 
         bool CanRead { get; }

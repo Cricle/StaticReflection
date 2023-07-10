@@ -46,7 +46,7 @@ namespace StaticReflection.Benchmark.Actions
                 _ = expression(student);
         }
         [Benchmark]
-        
+
         public void StaticReflection()
         {
             for (int i = 0; i < LoopCount; i++)

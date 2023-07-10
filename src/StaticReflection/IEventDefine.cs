@@ -1,10 +1,8 @@
-﻿using System;
-
-namespace StaticReflection
+﻿namespace StaticReflection
 {
     public static class EventDefineExecuteExtensions
     {
-        public static bool Start(this IEventDefine eventDefine,object instance)
+        public static bool Start(this IEventDefine eventDefine, object instance)
         {
             return ((IEventTransfer)eventDefine).Start(instance);
         }

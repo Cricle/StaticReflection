@@ -1,14 +1,11 @@
 ﻿using Microsoft.CodeAnalysis;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
 
 namespace StaticReflection.CodeGen.Generators
 {
     public partial class StaticReflectionGenerator
     {
-        protected string CreateSymbolProperties(SemanticModel model,ISymbol symbol)
+        protected string CreateSymbolProperties(SemanticModel model, ISymbol symbol)
         {
             var attributeStrs = GetAttributeStrings(model, symbol.GetAttributes());
 
@@ -50,7 +47,7 @@ namespace StaticReflection.CodeGen.Generators
         protected List<string> ExecuteConstructor(SourceProductionContext context, GeneratorTransformResult<ISymbol> node, INamedTypeSymbol targetType)
         {
             var members = targetType.GetMembers();
-            var constructors = members.OfType<IMethodSymbol>().Where(x =>x.MethodKind== MethodKind.Constructor||x.MethodKind== MethodKind.StaticConstructor).ToList();
+            var constructors = members.OfType<IMethodSymbol>().Where(x => x.MethodKind == MethodKind.Constructor || x.MethodKind == MethodKind.StaticConstructor).ToList();
             if (constructors.Count == 0)
             {
                 return new List<string>(0);
