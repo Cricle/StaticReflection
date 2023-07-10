@@ -2,6 +2,8 @@
 {
     public interface IAssemblyDefine : IMemberDefine
     {
+        string AssemblyFullName { get; }
+
         bool IsInteractive { get; }
 
         IAssemblyIdentity Identity { get; }

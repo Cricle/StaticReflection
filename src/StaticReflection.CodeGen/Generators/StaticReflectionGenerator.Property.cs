@@ -34,7 +34,7 @@ namespace StaticReflection.CodeGen.Generators
                 }
                 var avaVisi = IsAvaliableVisibility(property);
                 var ssr = name + property.Name + "PReflection";
-                var attributeStrs = GetAttributeStrings(property.GetAttributes());
+                var attributeStrs = GetAttributeStrings(node.SyntaxContext.SemanticModel, property.GetAttributes());
                 var getBody = $"throw new System.InvalidOperationException(\"The property {targetType}.{property} is set only\");";
                 if ((!property.IsWriteOnly|| property.IsReadOnly) && avaVisi)
                 {
@@ -114,9 +114,9 @@ namespace StaticReflection.CodeGen.Generators
  
         public System.Boolean ReturnsByRefReadonly {{ get; }} = {BoolToString(property.ReturnsByRefReadonly)};        
          
-        public System.Collections.Generic.IReadOnlyList<System.Attribute> GetterAttributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", GetAttributeStrings(property.GetMethod?.GetAttributes()))} }};  
+        public System.Collections.Generic.IReadOnlyList<System.Attribute> GetterAttributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", GetAttributeStrings(node.SyntaxContext.SemanticModel,property.GetMethod?.GetAttributes()))} }};  
         
-        public System.Collections.Generic.IReadOnlyList<System.Attribute> SetterAttributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", GetAttributeStrings(property.SetMethod?.GetAttributes()))} }};  
+        public System.Collections.Generic.IReadOnlyList<System.Attribute> SetterAttributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", GetAttributeStrings(node.SyntaxContext.SemanticModel, property.SetMethod?.GetAttributes()))} }};  
 
         public System.Collections.Generic.IReadOnlyList<System.Attribute> Attributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", attributeStrs)} }};
 

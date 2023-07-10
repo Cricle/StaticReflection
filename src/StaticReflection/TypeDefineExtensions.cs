@@ -1,9 +1,50 @@
-﻿using StaticReflection.Invoking;
+﻿using StaticReflection.Annotions;
+using StaticReflection.Invoking;
+using System.Reflection;
 
 namespace StaticReflection
 {
     public static class TypeDefineExtensions
     {
+        private static readonly Type staticReflectionType = typeof(StaticReflectionAssemblyAttribute);
+        private static readonly object findAssemblyLocker = new object();
+        private static readonly Dictionary<Assembly, IAssemblyDefine?> assemblyDefineMapper = new Dictionary<Assembly, IAssemblyDefine?>();
+
+        public static IAssemblyDefine? FindStaticAssembly(this Type type)
+        {
+            var assembly = type.Assembly;
+            if (!assemblyDefineMapper.TryGetValue(assembly,out var def))
+            {
+                lock (findAssemblyLocker)
+                {
+                    if (!assemblyDefineMapper.TryGetValue(assembly, out def))
+                    {
+                        def = CoreFindStaticAssembly(assembly);
+                        assemblyDefineMapper.Add(assembly, def);
+                    }
+                }
+            }
+            return def;
+        }
+        private static IAssemblyDefine? CoreFindStaticAssembly(Assembly assembly)
+        {
+            var assemblyType = assembly.GetTypes().Where(x => x.IsDefined(staticReflectionType)).FirstOrDefault();
+            if (assemblyType != null)
+            {
+                var prop = assemblyType.GetProperty("Default", BindingFlags.Static | BindingFlags.Public);
+                if (prop != null)
+                {
+                    return (IAssemblyDefine)prop.GetValue(null);
+                }
+                var constructor = assemblyType.GetConstructor(Type.EmptyTypes);
+                if (constructor != null)
+                {
+                    return (IAssemblyDefine)constructor.Invoke(null);
+                }
+            }
+            return null;
+        }
+
         public static ITypeDefine? FindType(this IAssemblyDefine assembly,string typeName)
         {
             return assembly.Types.FirstOrDefault(x => x.Name == typeName);

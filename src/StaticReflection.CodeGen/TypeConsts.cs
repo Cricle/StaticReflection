@@ -11,6 +11,10 @@
         public static readonly string Name = "StaticReflection.Annotions.StaticReflectionAssemblyAttribute";
 
         public static readonly string WithDefaultName = "WithDefault";
+
+        public static readonly string AssemblyFullName = "AssemblyFullName";
+
+        public static readonly string AssemblyName = "AssemblyName";
     }
 
     internal static class GenHeaders

@@ -8,6 +8,8 @@ namespace WW
         static void Main(string[] args)
         {
             var b=new Student();
+            var ss = typeof(Student).FindStaticAssembly();
+            Console.WriteLine(ss?.AssemblyFullName);
             var @class = C.Default.FindType("Student")!;
             @class.SetProperty(b, "Id", 1);
             Console.WriteLine("Id: "+@class.GetProperty(b, "Id"));
@@ -44,7 +46,7 @@ namespace WW
             return Id;
         }
     }
-    [StaticReflectionAssembly]
+    [StaticReflectionAssembly(AssemblyFullName = "Microsoft.VisualBasic.Core, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a")]
     public partial class C
     {
     }

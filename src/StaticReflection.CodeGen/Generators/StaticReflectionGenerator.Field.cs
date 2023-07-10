@@ -27,7 +27,7 @@ namespace StaticReflection.CodeGen.Generators
             foreach (var field in fields)
             {
                 var ssr = name + field.Name + "FReflection";
-                var attributeStrs = GetAttributeStrings(field.GetAttributes());
+                var attributeStrs = GetAttributeStrings(node.SyntaxContext.SemanticModel, field.GetAttributes());
                 var avaVisi = IsAvaliableVisibility(field);
                 types.Add(ssr);
 

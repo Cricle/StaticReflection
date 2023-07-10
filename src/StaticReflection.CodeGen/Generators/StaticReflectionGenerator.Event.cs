@@ -27,7 +27,7 @@ namespace StaticReflection.CodeGen.Generators
             foreach (var @event in events)
             {
                 var ssr = name + @event.Name + "EReflection";
-                var attributeStrs = GetAttributeStrings(@event.GetAttributes());
+                var attributeStrs = GetAttributeStrings(node.SyntaxContext.SemanticModel,@event.GetAttributes());
                 var delegateInvokeMethod = ((INamedTypeSymbol)@event.Type).DelegateInvokeMethod!;
                 types.Add(ssr);
 

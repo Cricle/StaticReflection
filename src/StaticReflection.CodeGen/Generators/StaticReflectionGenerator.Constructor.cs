@@ -8,9 +8,9 @@ namespace StaticReflection.CodeGen.Generators
 {
     public partial class StaticReflectionGenerator
     {
-        protected string CreateSymbolProperties(ISymbol symbol)
+        protected string CreateSymbolProperties(SemanticModel model,ISymbol symbol)
         {
-            var attributeStrs = GetAttributeStrings(symbol.GetAttributes());
+            var attributeStrs = GetAttributeStrings(model, symbol.GetAttributes());
 
             return $@"
 
@@ -71,7 +71,7 @@ namespace StaticReflection.CodeGen.Generators
                 index++;
 
                 types.Add(ssr);
-                var str = BuildPropertyClass(ssr, targetType, constructor);
+                var str = BuildPropertyClass(ssr, targetType, constructor, node.SyntaxContext.SemanticModel);
                 scriptBuilder.AppendLine(str);
             }
 

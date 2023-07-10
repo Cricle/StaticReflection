@@ -4,6 +4,7 @@ using System.Text;
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.IO.Pipes;
+using System.Xml.Linq;
 
 namespace StaticReflection.CodeGen.Generators
 {
@@ -96,7 +97,7 @@ unsafe
             }
         }
 
-        private string CreateMethodProperies(string targetType,IMethodSymbol method)
+        private string CreateMethodProperies(string targetType,IMethodSymbol method,SemanticModel model)
         {
             var typePars = new List<string>();
 
@@ -151,11 +152,11 @@ unsafe
         
         public System.Collections.Generic.IReadOnlyList<StaticReflection.ITypeArgumentDefine> TypeArguments {{ get; }} = new StaticReflection.ITypeArgumentDefine[] {{ {string.Join(",", typePars)} }};      
 
-        public System.Collections.Generic.IReadOnlyList<System.Attribute> ReturnTypeAttributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", GetAttributeStrings(method.GetReturnTypeAttributes()))} }};
+        public System.Collections.Generic.IReadOnlyList<System.Attribute> ReturnTypeAttributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", GetAttributeStrings(model, method.GetReturnTypeAttributes()))} }};
 
 ";
         }
-        private string BuildPropertyClass(string name,INamedTypeSymbol targetType, IMethodSymbol method)
+        private string BuildPropertyClass(string name,INamedTypeSymbol targetType, IMethodSymbol method,SemanticModel model)
         {
             var implementInvokeInterface = string.Empty;
             var invokeImplement = string.Empty;
@@ -346,8 +347,8 @@ public void InvokeUsualAnonymous(object instance{argNoRefStr})
 
         private {name}(){{ }}
 
-        {CreateSymbolProperties(method)}
-        {CreateMethodProperies(targetType.ToString(),method)}
+        {CreateSymbolProperties(model,method)}
+        {CreateMethodProperies(targetType.ToString(),method, model)}
         {invokeImplement}
         {invokeNoRefImplement}
     }}
@@ -377,7 +378,7 @@ public void InvokeUsualAnonymous(object instance{argNoRefStr})
                 var ssr = name + method.Name + "T" + method.TypeParameters.Length + "P" + index + "MReflection";
                 index++;
 
-                var str = BuildPropertyClass(ssr, targetType, method);
+                var str = BuildPropertyClass(ssr, targetType, method, node.SyntaxContext.SemanticModel);
                 types.Add(ssr);
 
                 scriptBuilder.AppendLine(str);
