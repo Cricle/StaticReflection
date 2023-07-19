@@ -22,7 +22,7 @@ namespace WW
                 Console.WriteLine("GoToSchool:" + method.InvokeUsualMethod(b));
             }
             var obj = @class.FindEmptyConstructor();
-            var inst = obj.InvokeUsualMethod(null);
+            var inst = obj!.InvokeUsualMethod(null);
             Console.WriteLine(inst);
         }
 
@@ -48,6 +48,10 @@ namespace WW
     }
     [StaticReflectionAssembly(AssemblyName = "Microsoft.VisualBasic.Core")]
     public partial class C
+    {
+    }
+    [StaticReflectionAssembly]
+    public partial class C1
     {
     }
 }

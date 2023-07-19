@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using System.Diagnostics;
 using System.Text;
 
 namespace StaticReflection.CodeGen.Generators
@@ -170,6 +171,7 @@ class {moduleName}:StaticReflection.IModuleIdentity
             }
             var str = $@"
 {GenHeaders.AutoGenHead}
+#pragma warning disable CS8669
 namespace {nameSpace}
 {{
     {GenHeaders.AttackAttribute}
@@ -282,11 +284,13 @@ namespace {nameSpace}
             if (!refTypes.TryGetValue(assemblyFullName, out var lst))
             {
                 lst = new HashSet<string>();
+                refTypes.Add(assemblyFullName, lst);
             }
             lst.Add(nameSpace + "." + ssr);
             var str = $@"
 {GenHeaders.AutoGenHead}
 #pragma warning disable CS9082
+#pragma warning disable CS8669
 namespace {nameSpace}
 {{
     {GenHeaders.AttackAttribute}
