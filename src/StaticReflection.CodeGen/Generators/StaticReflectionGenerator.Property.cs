@@ -21,15 +21,15 @@ namespace StaticReflection.CodeGen.Generators
             var scriptBuilder = new StringBuilder();
 
             var types = new List<string>();
-
+            var index = 0;
             foreach (var property in properyies)
             {
                 if (IsAutoGen(property))
                 {
                     continue;
                 }
-                var avaVisi = IsAvaliableVisibility(property);
-                var ssr = name + property.Name + "PReflection";
+                var avaVisi = node.IsAvaliableVisibility(property);
+                var ssr = name + index + "PReflection";
                 var attributeStrs = GetAttributeStrings(node.SyntaxContext.SemanticModel, property.GetAttributes());
                 var getBody = $"throw new System.InvalidOperationException(\"The property {targetType}.{property} is set only\");";
                 if ((!property.IsWriteOnly || property.IsReadOnly) && avaVisi)
@@ -139,6 +139,7 @@ namespace StaticReflection.CodeGen.Generators
     }}
 ";
                 scriptBuilder.AppendLine(str);
+                index++;
             }
             scriptBuilder.AppendLine();
             sourceScript.AppendLine(scriptBuilder.ToString());

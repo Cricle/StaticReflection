@@ -40,10 +40,6 @@ namespace StaticReflection.CodeGen.Generators
             return true;
         }
 
-        private bool IsAvaliableVisibility(ISymbol symbol)
-        {
-            return symbol.DeclaredAccessibility == Accessibility.Public || symbol.DeclaredAccessibility == Accessibility.Internal || symbol.DeclaredAccessibility == Accessibility.ProtectedAndInternal;
-        }
         protected virtual string GetAccessibilityString(Accessibility accessibility)
         {
             if (accessibility == Accessibility.Private)
@@ -73,6 +69,14 @@ namespace StaticReflection.CodeGen.Generators
             return symbol.GetAttributes()
                     .Any(x => x.AttributeClass?.ToString() == typeof(GeneratorAttribute).FullName);
         }
+        private string ToAttributeCsharp(TypedConstant constant)
+        {
+            if (constant.Kind== TypedConstantKind.Array)
+            {
+                return $"new [] {constant.ToCSharpString()}";
+            }
+            return constant.ToCSharpString();
+        }
         protected List<string> GetAttributeStrings(SemanticModel model, IEnumerable<AttributeData>? attributes)
         {
             if (attributes == null || !attributes.Any())
@@ -83,7 +87,7 @@ namespace StaticReflection.CodeGen.Generators
 
             foreach (var attr in attributes.Where(x => x.AttributeClass?.DeclaredAccessibility == Accessibility.Public || SymbolEqualityComparer.Default.Equals(x.AttributeClass?.ContainingAssembly, model.Compilation.Assembly)))
             {
-                var attrStr = $"new {attr.AttributeClass}({string.Join(",", attr.ConstructorArguments.Where(x => !x.IsNull).Select(x => x.ToCSharpString()))}) {{ {string.Join(",", attr.NamedArguments.Select(x => $"{x.Key}={x.Value.ToCSharpString()}"))} }}";
+                var attrStr = $"new {attr.AttributeClass}({string.Join(",", attr.ConstructorArguments.Where(x => !x.IsNull).Select(ToAttributeCsharp))}) {{ {string.Join(",", attr.NamedArguments.Select(x => $"{x.Key}={ToAttributeCsharp(x.Value)}"))} }}";
                 attributeStrs.Add(attrStr);
             }
             return attributeStrs;
@@ -236,6 +240,10 @@ namespace {nameSpace}
                 {
                     var attrType = (attr.NamedArguments.FirstOrDefault(x => x.Key == StaticReflectionAttributeConsts.TypeName).Value.Value as INamedTypeSymbol)?.OriginalDefinition;
                     targetType = attrType ?? targetType;
+                    if (targetType.IsStatic)
+                    {
+                        continue;//NOTE: Now is not support static class
+                    }
                     var newNode = new GeneratorTransformResult<ISymbol>(targetType, node.SyntaxContext);
                     if (attrType != null && processedType.Add(attrType.ToString()))
                     {

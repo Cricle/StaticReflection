@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using System.Diagnostics;
 using System.Text;
 
 namespace StaticReflection.CodeGen.Generators
@@ -151,13 +152,16 @@ unsafe
 
 ";
         }
-        private string BuildPropertyClass(string name, INamedTypeSymbol targetType, IMethodSymbol method, SemanticModel model)
+        private string BuildPropertyClass(string name, INamedTypeSymbol targetType, IMethodSymbol method, GeneratorTransformResult<ISymbol> result)
         {
+            var model = result.SyntaxContext.SemanticModel;
             var implementInvokeInterface = string.Empty;
             var invokeImplement = string.Empty;
             var invokeNoRefImplement = string.Empty;
-
-            if (!method.IsGenericMethod && IsAvaliableVisibility(method) || (method.MethodKind == MethodKind.Constructor && !method.IsStatic && IsAvaliableVisibility(method)))
+            
+            if ((!method.IsGenericMethod && result.IsAvaliableVisibility(method) || 
+                (method.MethodKind == MethodKind.Constructor && !method.IsStatic && result.IsAvaliableVisibility(method)))&&
+                (!method.ReturnsByRef&&method.Parameters.All(x=>(x.RefKind== RefKind.None||x.RefKind== RefKind.In)&&!x.Type.IsRefLikeType)))
             {
                 GetMethodDefine(targetType,
                     method,
@@ -180,7 +184,7 @@ unsafe
                     var par = method.Parameters[i];
                     var line = CompileArg(par.Type.ToString(), "arg" + i, par, initCodes);
                     bodyCodes.Add(line);
-                    bodyNoRefCodes.Add($"({par.Type.ToString()})arg{i}");
+                    bodyNoRefCodes.Add($"({par.Type})arg{i}");
                 }
                 var bodyCode = string.Join(",", bodyCodes);
                 var bodyCodeNoRef = string.Join(",", bodyNoRefCodes);
@@ -313,10 +317,6 @@ public void InvokeUsualAnonymous(object instance{argNoRefStr})
                 {
                     return $"ref System.Runtime.CompilerServices.Unsafe.{method}{inputArg})";
                 }
-                else if (symbol.RefKind == RefKind.RefReadOnly)
-                {
-                    return $"ref System.Runtime.CompilerServices.Unsafe.{method}{inputArg})";
-                }
                 else if (symbol.RefKind == RefKind.In)
                 {
                     return $"in System.Runtime.CompilerServices.Unsafe.{method}{inputArg})";
@@ -326,6 +326,10 @@ public void InvokeUsualAnonymous(object instance{argNoRefStr})
                     var argName = "out" + inputArg;
                     initCodes.AppendLine($"ref {symbol.Type} {argName} = ref System.Runtime.CompilerServices.Unsafe.As<{inputType},{symbol.Type}>(ref {inputArg})");
                     return $"out {argName}";
+                }
+                else if (symbol.RefKind == RefKind.RefReadOnly)
+                {
+                    return $"ref System.Runtime.CompilerServices.Unsafe.{method}{inputArg})";
                 }
                 else
                 {
@@ -350,11 +354,13 @@ public void InvokeUsualAnonymous(object instance{argNoRefStr})
 ";
             return str;
         }
+
         protected List<string> ExecuteMethods(SourceProductionContext context, GeneratorTransformResult<ISymbol> node, INamedTypeSymbol targetType)
         {
             var members = targetType.GetMembers();
             var methods = members.OfType<IMethodSymbol>()
                 .Where(x => (x.MethodKind == MethodKind.Ordinary) && !x.IsGenericMethod && (!x.Name.StartsWith("<") || !x.Name.EndsWith("$")))
+                .Where(x => !x.Parameters.Any(x => x.Type.IsRefLikeType) && !x.ReturnsByRef)
                 .ToList();
             if (methods.Count == 0)
             {
@@ -370,10 +376,10 @@ public void InvokeUsualAnonymous(object instance{argNoRefStr})
             var index = 0;
             foreach (var method in methods)
             {
-                var ssr = name + method.Name + "T" + method.TypeParameters.Length + "P" + index + "MReflection";
+                var ssr = name + index + "MReflection";
                 index++;
 
-                var str = BuildPropertyClass(ssr, targetType, method, node.SyntaxContext.SemanticModel);
+                var str = BuildPropertyClass(ssr, targetType, method, node);
                 types.Add(ssr);
 
                 scriptBuilder.AppendLine(str);

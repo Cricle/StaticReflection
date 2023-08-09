@@ -8,7 +8,7 @@ namespace StaticReflection.CodeGen.Generators
         protected List<string> ExecuteEvents(SourceProductionContext context, GeneratorTransformResult<ISymbol> node, INamedTypeSymbol targetType)
         {
             var members = targetType.GetMembers();
-            var events = members.OfType<IEventSymbol>().Where(x => x.Type is INamedTypeSymbol symbol && IsAvaliableVisibility(x) && symbol.DelegateInvokeMethod != null).ToList();
+            var events = members.OfType<IEventSymbol>().Where(x => x.Type is INamedTypeSymbol symbol && node.IsAvaliableVisibility(x) && symbol.DelegateInvokeMethod != null).ToList();
             if (events.Count == 0)
             {
                 return new List<string>(0);
@@ -32,7 +32,7 @@ namespace StaticReflection.CodeGen.Generators
                 var implInterface = string.Empty;
                 var additionClass = string.Empty;
                 var implMethods = string.Empty;
-                if (IsAvaliableVisibility(@event) && @event.AddMethod != null && @event.RemoveMethod != null)
+                if (node.IsAvaliableVisibility(@event) && @event.AddMethod != null && @event.RemoveMethod != null)
                 {
                     var scopeClassName = ssr + "Scope";//Static ?
                     var selectVisit = string.Empty;

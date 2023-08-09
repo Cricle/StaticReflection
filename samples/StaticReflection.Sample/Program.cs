@@ -46,7 +46,8 @@ namespace WW
             return Id;
         }
     }
-    [StaticReflectionAssembly(AssemblyName = "Microsoft.VisualBasic.Core")]
+    [StaticReflection(Type =typeof(System.Uri))]
+    [StaticReflectionAssembly(AssemblyName = "System")]
     public partial class C
     {
     }

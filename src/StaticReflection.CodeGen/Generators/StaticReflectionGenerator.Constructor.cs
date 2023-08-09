@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using System.Diagnostics;
 using System.Text;
 
 namespace StaticReflection.CodeGen.Generators
@@ -47,7 +48,8 @@ namespace StaticReflection.CodeGen.Generators
         protected List<string> ExecuteConstructor(SourceProductionContext context, GeneratorTransformResult<ISymbol> node, INamedTypeSymbol targetType)
         {
             var members = targetType.GetMembers();
-            var constructors = members.OfType<IMethodSymbol>().Where(x => x.MethodKind == MethodKind.Constructor || x.MethodKind == MethodKind.StaticConstructor).ToList();
+            var constructors = members.OfType<IMethodSymbol>()
+                .Where(x => x.MethodKind == MethodKind.Constructor || x.MethodKind == MethodKind.StaticConstructor).ToList();
             if (constructors.Count == 0)
             {
                 return new List<string>(0);
@@ -68,7 +70,7 @@ namespace StaticReflection.CodeGen.Generators
                 index++;
 
                 types.Add(ssr);
-                var str = BuildPropertyClass(ssr, targetType, constructor, node.SyntaxContext.SemanticModel);
+                var str = BuildPropertyClass(ssr, targetType, constructor, node);
                 scriptBuilder.AppendLine(str);
             }
 

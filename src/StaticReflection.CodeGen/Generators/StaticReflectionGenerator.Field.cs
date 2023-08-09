@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using System.Diagnostics;
 using System.Text;
 
 namespace StaticReflection.CodeGen.Generators
@@ -8,7 +9,7 @@ namespace StaticReflection.CodeGen.Generators
         protected List<string> ExecuteFields(SourceProductionContext context, GeneratorTransformResult<ISymbol> node, INamedTypeSymbol targetType)
         {
             var members = targetType.GetMembers();
-            var fields = members.OfType<IFieldSymbol>().Where(x => IsAvaliableVisibility(x)).ToList();
+            var fields = members.OfType<IFieldSymbol>().Where(x => node.IsAvaliableVisibility(x)).ToList();
             if (fields.Count == 0)
             {
                 return new List<string>(0);
@@ -26,37 +27,70 @@ namespace StaticReflection.CodeGen.Generators
             {
                 var ssr = name + field.Name + "FReflection";
                 var attributeStrs = GetAttributeStrings(node.SyntaxContext.SemanticModel, field.GetAttributes());
-                var avaVisi = IsAvaliableVisibility(field);
+                var avaVisi = node.IsAvaliableVisibility(field);
                 types.Add(ssr);
-
-                var getBody = $"throw new System.InvalidOperationException(\"The property {targetType}.{field} is set only\");";
+                var writeInterface = string.Empty;
+                var writeImpl = string.Empty;
                 if (avaVisi)
                 {
-                    if (field.IsStatic)
+                    writeInterface = $",StaticReflection.IMemberInvokeDefine<{targetType},{field.Type}>,StaticReflection.IMemberAnonymousInvokeDefine";
+                    var getBody = $"throw new System.InvalidOperationException(\"The property {targetType}.{field} is set only\");";
+                    var anyOk = false;
+                    if (avaVisi)
                     {
-                        getBody = $"return {targetType}.{field.Name};";
+                        if (field.IsStatic)
+                        {
+                            getBody = $"return {targetType}.{field.Name};";
+                        }
+                        else
+                        {
+                            getBody = $"return instance.{field.Name};";
+                        }
+                        anyOk = true;
                     }
-                    else
+                    var setBody = $"throw new System.InvalidOperationException(\"The property {targetType}.{field} is read only or const\");";
+                    if (!field.IsConst&&!field.IsReadOnly && avaVisi)
                     {
-                        getBody = $"return instance.{field.Name};";
+                        if (field.IsStatic)
+                        {
+                            setBody = $"{targetType}.{field.Name} = value;";
+                        }
+                        else
+                        {
+                            setBody = $"instance.{field.Name} = value;";
+                        }
+                        anyOk = true;
                     }
-                }
-                var setBody = $"throw new System.InvalidOperationException(\"The property {targetType}.{field} is read only\");";
-                if (!field.IsConst && avaVisi)
-                {
-                    if (field.IsStatic)
+                    if (anyOk)
                     {
-                        setBody = $"{targetType}.{field.Name} = value;";
-                    }
-                    else
-                    {
-                        setBody = $"instance.{field.Name} = value;";
+
+                        writeImpl = $@"
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public {field.Type} GetValue({name} instance)
+        {{
+            {getBody}
+        }}
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public void SetValue({name} instance,{field.Type} value)
+        {{
+            {setBody}
+        }}
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public void SetValueAnonymous(object instance, object value)
+        {{
+            SetValue(({targetType})instance,({field.Type})value);
+        }}
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public object GetValueAnonymous(object instance)
+        {{
+            return ({field.Type})GetValue(({targetType})instance);
+        }}";
                     }
                 }
 
                 var str = $@"
     {GenHeaders.AttackAttribute}
-    {visibility} sealed class {ssr}:IFieldDefine,StaticReflection.IMemberInvokeDefine<{targetType},{field.Type}>,StaticReflection.IMemberAnonymousInvokeDefine
+    {visibility} sealed class {ssr}:StaticReflection.IFieldDefine{writeInterface}
     {{
         public static readonly {ssr} Instance = new {ssr}();
 
@@ -113,28 +147,8 @@ namespace StaticReflection.CodeGen.Generators
         public StaticReflection.StaticRefKind RefKind {{ get; }} = StaticReflection.StaticRefKind.{Enum.GetName(typeof(RefKind), field.RefKind)};
 
         public System.Collections.Generic.IReadOnlyList<System.Attribute> Attributes {{ get; }} = new System.Attribute[] {{ {string.Join(",", attributeStrs)} }};
-
         
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public {field.Type} GetValue({name} instance)
-        {{
-            {getBody}
-        }}
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public void SetValue({name} instance,{field.Type} value)
-        {{
-            {setBody}
-        }}
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public void SetValueAnonymous(object instance, object value)
-        {{
-            SetValue(({targetType})instance,({field.Type})value);
-        }}
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public object GetValueAnonymous(object instance)
-        {{
-            return ({field.Type})GetValue(({targetType})instance);
-        }}
+        {writeImpl}
     }}
 ";
                 scriptBuilder.AppendLine(str);
