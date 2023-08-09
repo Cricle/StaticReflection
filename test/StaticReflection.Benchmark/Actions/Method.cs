@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
+using StaticReflection.Invoking;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -32,7 +33,7 @@ namespace StaticReflection.Benchmark.Actions
             var par2 = Expression.Parameter(typeof(object));
             expression = Expression.Lambda<Action<object, object>>(
                 Expression.Call(
-                        Expression.Convert(par1, typeof(Student)), typeof(Student).GetMethod(nameof(Student.Go)), Expression.Convert(par2, typeof(int))), par1, par2).Compile(preferInterpretation: true);
+                        Expression.Convert(par1, typeof(Student)), typeof(Student).GetMethod(nameof(Student.Go)), Expression.Convert(par2, typeof(object))), par1, par2).Compile(preferInterpretation: true);
             methodInfo = typeof(Student).GetMethod(nameof(Student.Go));
         }
 
@@ -43,12 +44,12 @@ namespace StaticReflection.Benchmark.Actions
         public void Raw()
         {
             for (int i = 0; i < LoopCount; i++)
-                student.Go(1);
+                student.Go(null);
         }
         [Benchmark]
         public void ReflectionCall()
         {
-            var args = new object[] { 1 };
+            var args = new object[] { null };
             for (int i = 0; i < LoopCount; i++)
                 methodInfo.Invoke(student, args);
         }
@@ -56,22 +57,17 @@ namespace StaticReflection.Benchmark.Actions
         public void ExpressionCall()
         {
             for (int i = 0; i < LoopCount; i++)
-                expression(student, 1);
+                expression(student, null);
         }
 
         [Benchmark]
         public void StaticReflection()
         {
-            object obji = 1;
+            var m = (IUsualVoidArgs1AnonymousMethod)StudentReflection.Instance.Methods.First(x => x.Name == nameof(Student.Go));
             for (int i = 0; i < LoopCount; i++)
             {
-                //InvokeUsual(student, 1);
-                StudentReflection.StudentGoT0P0MReflection.Instance.InvokeUsualAnonymous(student, obji);
+                m.InvokeUsualAnonymous(student, null);
             }
-        }
-        void InvokeUsual(Student instance, int arg0)
-        {
-            instance.Go((int)(arg0));
         }
     }
 }

@@ -4,6 +4,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
+using StaticReflection.Benchmark.Actions;
 
 namespace StaticReflection.Benchmark
 {

@@ -4,10 +4,10 @@
 
 BenchmarkDotNet=v0.13.5, OS=Windows 10 (10.0.19045.2006/22H2/2022Update)
 AMD Ryzen 7 5800H with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
-.NET SDK=7.0.203
-  [Host]   : .NET 7.0.5 (7.0.523.17405), X64 RyuJIT AVX2
-  AOT      : .NET 7.0.5-servicing.23174.5, X64 NativeAOT AVX2
-  ShortRun : .NET 7.0.5 (7.0.523.17405), X64 RyuJIT AVX2
+.NET SDK=8.0.100-preview.6.23330.14
+  [Host]   : .NET 7.0.9 (7.0.923.32018), X64 RyuJIT AVX2
+  AOT      : .NET 7.0.8-servicing.23318.7, X64 NativeAOT AVX2
+  ShortRun : .NET 7.0.9 (7.0.923.32018), X64 RyuJIT AVX2
 
 Platform=X64  Server=True  IterationCount=3  
 LaunchCount=1  WarmupCount=3  
@@ -15,15 +15,15 @@ LaunchCount=1  WarmupCount=3
 ```
 |           Method |      Job |       Runtime | LoopCount |       Mean |       Error |     StdDev |  Ratio | RatioSD |   Gen0 | Allocated | Alloc Ratio |
 |----------------- |--------- |-------------- |---------- |-----------:|------------:|-----------:|-------:|--------:|-------:|----------:|------------:|
-|              Raw |      AOT | NativeAOT 7.0 |      5012 |   6.211 μs |   4.8017 μs |  0.2632 μs |   1.00 |    0.00 |      - |         - |          NA |
-|   ReflectionCall |      AOT | NativeAOT 7.0 |      5012 | 102.560 μs |  39.6599 μs |  2.1739 μs |  16.52 |    0.41 |      - |      56 B |          NA |
-|   ExpressionCall |      AOT | NativeAOT 7.0 |      5012 | 785.787 μs | 261.7251 μs | 14.3460 μs | 126.72 |    7.45 | 8.7891 | 1283072 B |          NA |
-| StaticReflection |      AOT | NativeAOT 7.0 |      5012 |   7.456 μs |   1.9480 μs |  0.1068 μs |   1.20 |    0.06 |      - |      24 B |          NA |
+|              Raw |      AOT | NativeAOT 7.0 |      5012 |   6.016 μs |   0.1154 μs |  0.0063 μs |   1.00 |    0.00 |      - |         - |          NA |
+|   ReflectionCall |      AOT | NativeAOT 7.0 |      5012 |  96.739 μs |  26.3280 μs |  1.4431 μs |  16.08 |    0.23 |      - |      32 B |          NA |
+|   ExpressionCall |      AOT | NativeAOT 7.0 |      5012 | 680.023 μs | 217.8110 μs | 11.9390 μs | 113.04 |    1.89 | 6.8359 | 1042496 B |          NA |
+| StaticReflection |      AOT | NativeAOT 7.0 |      5012 |   7.444 μs |   0.5588 μs |  0.0306 μs |   1.24 |    0.01 |      - |      32 B |          NA |
 |                  |          |               |           |            |             |            |        |         |        |           |             |
-|              Raw | ShortRun |      .NET 7.0 |      5012 |   6.176 μs |   0.5750 μs |  0.0315 μs |   1.00 |    0.00 |      - |         - |          NA |
-|   ReflectionCall | ShortRun |      .NET 7.0 |      5012 | 107.819 μs |  20.6378 μs |  1.1312 μs |  17.46 |    0.10 |      - |      56 B |          NA |
-|   ExpressionCall | ShortRun |      .NET 7.0 |      5012 | 549.402 μs |  12.6833 μs |  0.6952 μs |  88.95 |    0.50 | 7.8125 | 1122688 B |          NA |
-| StaticReflection | ShortRun |      .NET 7.0 |      5012 |  12.423 μs |   1.6104 μs |  0.0883 μs |   2.01 |    0.00 |      - |      24 B |          NA |
+|              Raw | ShortRun |      .NET 7.0 |      5012 |   7.374 μs |   1.0696 μs |  0.0586 μs |   1.00 |    0.00 |      - |         - |          NA |
+|   ReflectionCall | ShortRun |      .NET 7.0 |      5012 | 110.094 μs |  36.3773 μs |  1.9940 μs |  14.93 |    0.23 |      - |      32 B |          NA |
+|   ExpressionCall | ShortRun |      .NET 7.0 |      5012 | 466.819 μs |  31.4891 μs |  1.7260 μs |  63.31 |    0.74 | 5.8594 |  882112 B |          NA |
+| StaticReflection | ShortRun |      .NET 7.0 |      5012 |  12.195 μs |   3.1662 μs |  0.1735 μs |   1.65 |    0.01 |      - |      32 B |          NA |
 
 
 ## ObjectCreate
@@ -32,10 +32,10 @@ LaunchCount=1  WarmupCount=3
 
 BenchmarkDotNet=v0.13.5, OS=Windows 10 (10.0.19045.2006/22H2/2022Update)
 AMD Ryzen 7 5800H with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
-.NET SDK=7.0.203
-  [Host]   : .NET 7.0.5 (7.0.523.17405), X64 RyuJIT AVX2
-  AOT      : .NET 7.0.5-servicing.23174.5, X64 NativeAOT AVX2
-  ShortRun : .NET 7.0.5 (7.0.523.17405), X64 RyuJIT AVX2
+.NET SDK=8.0.100-preview.6.23330.14
+  [Host]   : .NET 7.0.9 (7.0.923.32018), X64 RyuJIT AVX2
+  AOT      : .NET 7.0.8-servicing.23318.7, X64 NativeAOT AVX2
+  ShortRun : .NET 7.0.9 (7.0.923.32018), X64 RyuJIT AVX2
 
 Platform=X64  Server=True  IterationCount=3  
 LaunchCount=1  WarmupCount=3  
@@ -43,15 +43,15 @@ LaunchCount=1  WarmupCount=3
 ```
 |           Method |      Job |       Runtime | LoopCount |       Mean |      Error |    StdDev |  Ratio | RatioSD |   Gen0 | Allocated | Alloc Ratio |
 |----------------- |--------- |-------------- |---------- |-----------:|-----------:|----------:|-------:|--------:|-------:|----------:|------------:|
-|              Raw |      AOT | NativeAOT 7.0 |      5012 |   1.194 μs |  0.0216 μs | 0.0012 μs |   1.00 |    0.00 |      - |         - |          NA |
-|   ReflectionCall |      AOT | NativeAOT 7.0 |      5012 | 189.577 μs |  5.1819 μs | 0.2840 μs | 158.73 |    0.16 | 0.9766 |  160384 B |          NA |
-|   ExpressionCall |      AOT | NativeAOT 7.0 |      5012 | 422.646 μs | 53.4768 μs | 2.9312 μs | 353.87 |    2.71 | 4.8828 |  721728 B |          NA |
-| StaticReflection |      AOT | NativeAOT 7.0 |      5012 |   1.224 μs |  0.3699 μs | 0.0203 μs |   1.02 |    0.02 |      - |         - |          NA |
+|              Raw |      AOT | NativeAOT 7.0 |      5012 |   1.171 μs |  0.0694 μs | 0.0038 μs |   1.00 |    0.00 |      - |         - |          NA |
+|   ReflectionCall |      AOT | NativeAOT 7.0 |      5012 | 178.302 μs | 10.5394 μs | 0.5777 μs | 152.25 |    0.95 | 0.9766 |  160384 B |          NA |
+|   ExpressionCall |      AOT | NativeAOT 7.0 |      5012 | 425.804 μs | 75.3138 μs | 4.1282 μs | 363.58 |    2.35 | 4.8828 |  721728 B |          NA |
+| StaticReflection |      AOT | NativeAOT 7.0 |      5012 |   1.170 μs |  0.0987 μs | 0.0054 μs |   1.00 |    0.01 |      - |         - |          NA |
 |                  |          |               |           |            |            |           |        |         |        |           |             |
-|              Raw | ShortRun |      .NET 7.0 |      5012 |   1.202 μs |  0.2588 μs | 0.0142 μs |   1.00 |    0.00 |      - |         - |          NA |
-|   ReflectionCall | ShortRun |      .NET 7.0 |      5012 |  66.662 μs | 30.9529 μs | 1.6966 μs |  55.46 |    1.96 | 1.0986 |  160384 B |          NA |
-|   ExpressionCall | ShortRun |      .NET 7.0 |      5012 |  30.965 μs | 11.1004 μs | 0.6085 μs |  25.76 |    0.79 | 1.1292 |  160384 B |          NA |
-| StaticReflection | ShortRun |      .NET 7.0 |      5012 |   1.214 μs |  0.0808 μs | 0.0044 μs |   1.01 |    0.02 |      - |         - |          NA |
+|              Raw | ShortRun |      .NET 7.0 |      5012 |   1.161 μs |  0.1222 μs | 0.0067 μs |   1.00 |    0.00 |      - |         - |          NA |
+|   ReflectionCall | ShortRun |      .NET 7.0 |      5012 |  64.604 μs |  3.7983 μs | 0.2082 μs |  55.66 |    0.46 | 1.0986 |  160384 B |          NA |
+|   ExpressionCall | ShortRun |      .NET 7.0 |      5012 |  27.307 μs |  3.5370 μs | 0.1939 μs |  23.53 |    0.30 | 1.1292 |  160384 B |          NA |
+| StaticReflection | ShortRun |      .NET 7.0 |      5012 |   1.191 μs |  0.2042 μs | 0.0112 μs |   1.03 |    0.01 |      - |         - |          NA |
 
 
 ## PropertyRead
@@ -60,26 +60,26 @@ LaunchCount=1  WarmupCount=3
 
 BenchmarkDotNet=v0.13.5, OS=Windows 10 (10.0.19045.2006/22H2/2022Update)
 AMD Ryzen 7 5800H with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
-.NET SDK=7.0.203
-  [Host]   : .NET 7.0.5 (7.0.523.17405), X64 RyuJIT AVX2
-  AOT      : .NET 7.0.5-servicing.23174.5, X64 NativeAOT AVX2
-  ShortRun : .NET 7.0.5 (7.0.523.17405), X64 RyuJIT AVX2
+.NET SDK=8.0.100-preview.6.23330.14
+  [Host]   : .NET 7.0.9 (7.0.923.32018), X64 RyuJIT AVX2
+  AOT      : .NET 7.0.8-servicing.23318.7, X64 NativeAOT AVX2
+  ShortRun : .NET 7.0.9 (7.0.923.32018), X64 RyuJIT AVX2
 
 Platform=X64  Server=True  IterationCount=3  
 LaunchCount=1  WarmupCount=3  
 
 ```
-|           Method |      Job |       Runtime | LoopCount |       Mean |       Error |    StdDev |  Ratio | RatioSD |   Gen0 | Allocated | Alloc Ratio |
-|----------------- |--------- |-------------- |---------- |-----------:|------------:|----------:|-------:|--------:|-------:|----------:|------------:|
-|              Raw |      AOT | NativeAOT 7.0 |      5012 |   1.197 μs |   0.3370 μs | 0.0185 μs |   1.00 |    0.00 |      - |         - |          NA |
-|   ReflectionCall |      AOT | NativeAOT 7.0 |      5012 | 101.288 μs |  12.0815 μs | 0.6622 μs |  84.65 |    1.63 | 0.8545 |  120288 B |          NA |
-|   ExpressionCall |      AOT | NativeAOT 7.0 |      5012 | 605.515 μs | 111.2058 μs | 6.0956 μs | 506.02 |    7.21 | 5.8594 |  882112 B |          NA |
-| StaticReflection |      AOT | NativeAOT 7.0 |      5012 |  21.233 μs |   1.3268 μs | 0.0727 μs |  17.74 |    0.23 | 0.8545 |  120288 B |          NA |
-|                  |          |               |           |            |             |           |        |         |        |           |             |
-|              Raw | ShortRun |      .NET 7.0 |      5012 |   1.179 μs |   0.1655 μs | 0.0091 μs |   1.00 |    0.00 |      - |         - |          NA |
-|   ReflectionCall | ShortRun |      .NET 7.0 |      5012 |  75.988 μs |   8.7597 μs | 0.4802 μs |  64.48 |    0.90 | 0.8545 |  120288 B |          NA |
-|   ExpressionCall | ShortRun |      .NET 7.0 |      5012 |  33.993 μs |   9.6227 μs | 0.5275 μs |  28.84 |    0.61 | 0.8545 |  120288 B |          NA |
-| StaticReflection | ShortRun |      .NET 7.0 |      5012 |  27.295 μs |   4.5498 μs | 0.2494 μs |  23.16 |    0.06 | 0.8545 |  120288 B |          NA |
+|           Method |      Job |       Runtime | LoopCount |       Mean |      Error |    StdDev |  Ratio | RatioSD |   Gen0 | Allocated | Alloc Ratio |
+|----------------- |--------- |-------------- |---------- |-----------:|-----------:|----------:|-------:|--------:|-------:|----------:|------------:|
+|              Raw |      AOT | NativeAOT 7.0 |      5012 |   1.183 μs |  0.1807 μs | 0.0099 μs |   1.00 |    0.00 |      - |         - |          NA |
+|   ReflectionCall |      AOT | NativeAOT 7.0 |      5012 |  82.294 μs |  3.3044 μs | 0.1811 μs |  69.54 |    0.43 |      - |         - |          NA |
+|   ExpressionCall |      AOT | NativeAOT 7.0 |      5012 | 565.929 μs | 50.3752 μs | 2.7612 μs | 478.25 |    6.17 | 4.8828 |  761824 B |          NA |
+| StaticReflection |      AOT | NativeAOT 7.0 |      5012 |  14.452 μs |  0.5682 μs | 0.0311 μs |  12.21 |    0.13 |      - |      32 B |          NA |
+|                  |          |               |           |            |            |           |        |         |        |           |             |
+|              Raw | ShortRun |      .NET 7.0 |      5012 |   1.203 μs |  1.0619 μs | 0.0582 μs |   1.00 |    0.00 |      - |         - |          NA |
+|   ReflectionCall | ShortRun |      .NET 7.0 |      5012 |  54.136 μs |  2.1328 μs | 0.1169 μs |  45.06 |    2.23 |      - |         - |          NA |
+|   ExpressionCall | ShortRun |      .NET 7.0 |      5012 |   7.538 μs |  0.1485 μs | 0.0081 μs |   6.27 |    0.30 |      - |         - |          NA |
+| StaticReflection | ShortRun |      .NET 7.0 |      5012 |  10.810 μs |  0.9135 μs | 0.0501 μs |   9.00 |    0.44 |      - |      32 B |          NA |
 
 ## PropertyWrite
 
@@ -87,23 +87,23 @@ LaunchCount=1  WarmupCount=3
 
 BenchmarkDotNet=v0.13.5, OS=Windows 10 (10.0.19045.2006/22H2/2022Update)
 AMD Ryzen 7 5800H with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
-.NET SDK=7.0.203
-  [Host]   : .NET 7.0.5 (7.0.523.17405), X64 RyuJIT AVX2
-  AOT      : .NET 7.0.5-servicing.23174.5, X64 NativeAOT AVX2
-  ShortRun : .NET 7.0.5 (7.0.523.17405), X64 RyuJIT AVX2
+.NET SDK=8.0.100-preview.6.23330.14
+  [Host]   : .NET 7.0.9 (7.0.923.32018), X64 RyuJIT AVX2
+  AOT      : .NET 7.0.8-servicing.23318.7, X64 NativeAOT AVX2
+  ShortRun : .NET 7.0.9 (7.0.923.32018), X64 RyuJIT AVX2
 
 Platform=X64  Server=True  IterationCount=3  
 LaunchCount=1  WarmupCount=3  
 
 ```
-|           Method |      Job |       Runtime | LoopCount |       Mean |       Error |    StdDev |  Ratio | RatioSD |   Gen0 | Allocated | Alloc Ratio |
-|----------------- |--------- |-------------- |---------- |-----------:|------------:|----------:|-------:|--------:|-------:|----------:|------------:|
-|              Raw |      AOT | NativeAOT 7.0 |      5012 |   2.517 μs |   1.1000 μs | 0.0603 μs |   1.00 |    0.00 |      - |         - |          NA |
-|   ReflectionCall |      AOT | NativeAOT 7.0 |      5012 | 160.702 μs |  12.2707 μs | 0.6726 μs |  63.88 |    1.80 | 1.9531 |  280672 B |          NA |
-|   ExpressionCall |      AOT | NativeAOT 7.0 |      5012 | 766.822 μs | 182.1186 μs | 9.9825 μs | 304.83 |   10.86 | 8.7891 | 1283072 B |          NA |
-| StaticReflection |      AOT | NativeAOT 7.0 |      5012 |  21.119 μs |   9.8296 μs | 0.5388 μs |   8.39 |    0.32 | 0.8545 |  120288 B |          NA |
-|                  |          |               |           |            |             |           |        |         |        |           |             |
-|              Raw | ShortRun |      .NET 7.0 |      5012 |   1.191 μs |   0.1313 μs | 0.0072 μs |   1.00 |    0.00 |      - |         - |          NA |
-|   ReflectionCall | ShortRun |      .NET 7.0 |      5012 | 143.513 μs |  27.4212 μs | 1.5031 μs | 120.52 |    1.97 | 0.7324 |  120288 B |          NA |
-|   ExpressionCall | ShortRun |      .NET 7.0 |      5012 |  27.813 μs |   1.0046 μs | 0.0551 μs |  23.36 |    0.10 | 0.8545 |  120288 B |          NA |
-| StaticReflection | ShortRun |      .NET 7.0 |      5012 |  22.083 μs |   2.6402 μs | 0.1447 μs |  18.54 |    0.09 | 0.8545 |  120288 B |          NA |
+|           Method |      Job |       Runtime | LoopCount |      Mean |     Error |   StdDev | Ratio | RatioSD |   Gen0 |  Allocated | Alloc Ratio |
+|----------------- |--------- |-------------- |---------- |----------:|----------:|---------:|------:|--------:|-------:|-----------:|------------:|
+|              Raw |      AOT | NativeAOT 7.0 |      5012 |  52.27 μs | 22.661 μs | 1.242 μs |  1.00 |    0.00 | 1.0986 |  156.31 KB |        1.00 |
+|   ReflectionCall |      AOT | NativeAOT 7.0 |      5012 | 198.79 μs | 17.250 μs | 0.946 μs |  3.81 |    0.10 | 2.1973 |  312.94 KB |        2.00 |
+|   ExpressionCall |      AOT | NativeAOT 7.0 |      5012 | 853.24 μs | 72.186 μs | 3.957 μs | 16.33 |    0.32 | 7.8125 | 1174.38 KB |        7.51 |
+| StaticReflection |      AOT | NativeAOT 7.0 |      5012 |  64.65 μs |  2.422 μs | 0.133 μs |  1.24 |    0.03 | 1.0986 |  156.34 KB |        1.00 |
+|                  |          |               |           |           |           |          |       |         |        |            |             |
+|              Raw | ShortRun |      .NET 7.0 |      5012 |  62.83 μs | 24.774 μs | 1.358 μs |  1.00 |    0.00 | 1.0986 |  156.31 KB |        1.00 |
+|   ReflectionCall | ShortRun |      .NET 7.0 |      5012 | 177.58 μs |  0.703 μs | 0.039 μs |  2.83 |    0.06 | 0.9766 |  156.31 KB |        1.00 |
+|   ExpressionCall | ShortRun |      .NET 7.0 |      5012 |  66.29 μs |  9.170 μs | 0.503 μs |  1.06 |    0.03 | 1.0986 |  156.31 KB |        1.00 |
+| StaticReflection | ShortRun |      .NET 7.0 |      5012 |  69.13 μs | 15.621 μs | 0.856 μs |  1.10 |    0.03 | 1.0986 |  156.34 KB |        1.00 |

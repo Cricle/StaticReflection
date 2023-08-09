@@ -46,7 +46,7 @@ namespace WW
             return Id;
         }
     }
-    [StaticReflection(Type =typeof(System.Uri))]
+    [StaticReflection(Type =typeof(System.DateTime))]
     [StaticReflectionAssembly(AssemblyName = "System")]
     public partial class C
     {

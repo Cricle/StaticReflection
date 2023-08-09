@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net7.0;net472;</TargetFrameworks>
+    <TargetFrameworks>net7.0;</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
 	  <LangVersion>latest</LangVersion>
 	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

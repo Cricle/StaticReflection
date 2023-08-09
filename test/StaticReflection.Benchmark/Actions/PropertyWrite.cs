@@ -21,9 +21,9 @@ namespace StaticReflection.Benchmark.Actions
             var par2 = Expression.Parameter(typeof(object));
             expression = Expression.Lambda<Action<object, object>>(
                 Expression.Call(
-                        Expression.Convert(par1, typeof(Student)), typeof(Student).GetProperty(nameof(Student.Id)).SetMethod,
-                        Expression.Convert(par2, typeof(int))), par1, par2).Compile();
-            propertyInfo = typeof(Student).GetProperty(nameof(Student.Id));
+                        Expression.Convert(par1, typeof(Student)), typeof(Student).GetProperty(nameof(Student.Name)).SetMethod,
+                        Expression.Convert(par2, typeof(string))), par1, par2).Compile();
+            propertyInfo = typeof(Student).GetProperty(nameof(Student.Name));
         }
 
         [Params(5012)]
@@ -33,27 +33,28 @@ namespace StaticReflection.Benchmark.Actions
         public void Raw()
         {
             for (int i = 0; i < LoopCount; i++)
-                student.Id = i;
+                student.Name = i.ToString();
         }
         [Benchmark]
         public void ReflectionCall()
         {
             for (int i = 0; i < LoopCount; i++)
-                propertyInfo.SetValue(student, i);
+                propertyInfo.SetValue(student, i.ToString());
         }
         [Benchmark]
         public void ExpressionCall()
         {
             for (int i = 0; i < LoopCount; i++)
-                expression(student, i);
+                expression(student, i.ToString());
         }
-        [Benchmark]
 
+        [Benchmark]
         public void StaticReflection()
         {
+            var @ref = (IMemberAnonymousInvokeDefine)StudentReflection.Instance.Properties.First(x => x.Name == nameof(Student.Name));
             for (int i = 0; i < LoopCount; i++)
             {
-                StudentReflection.StudentIdPReflection.Instance.SetValueAnonymous(student, i);
+                @ref.SetValueAnonymous(student, i.ToString());
             }
         }
     }

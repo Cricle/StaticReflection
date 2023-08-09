@@ -20,8 +20,8 @@ namespace StaticReflection.Benchmark.Actions
             expression = Expression.Lambda<Func<object, object>>(
                 Expression.Convert(
                     Expression.Call(
-                        Expression.Convert(par1, typeof(Student)), typeof(Student).GetProperty(nameof(Student.Id)).GetMethod), typeof(object)), par1).Compile();
-            propertyInfo = typeof(Student).GetProperty(nameof(Student.Id));
+                        Expression.Convert(par1, typeof(Student)), typeof(Student).GetProperty(nameof(Student.Name)).GetMethod), typeof(object)), par1).Compile();
+            propertyInfo = typeof(Student).GetProperty(nameof(Student.Name));
         }
 
         [Params(5012)]
@@ -31,7 +31,7 @@ namespace StaticReflection.Benchmark.Actions
         public void Raw()
         {
             for (int i = 0; i < LoopCount; i++)
-                _ = student.Id;
+                _ = student.Name;
         }
         [Benchmark]
         public void ReflectionCall()
@@ -45,13 +45,14 @@ namespace StaticReflection.Benchmark.Actions
             for (int i = 0; i < LoopCount; i++)
                 _ = expression(student);
         }
-        [Benchmark]
 
+        [Benchmark]
         public void StaticReflection()
         {
+            var @ref = (IMemberAnonymousInvokeDefine)StudentReflection.Instance.Properties.First(x => x.Name == nameof(Student.Name));
             for (int i = 0; i < LoopCount; i++)
             {
-                _ = StudentReflection.StudentIdPReflection.Instance.GetValueAnonymous(student);
+                _ = @ref.GetValueAnonymous(student);
             }
         }
     }

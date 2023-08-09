@@ -15,10 +15,8 @@ namespace StaticReflection.Benchmark
         public string Name { get; set; }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public void Go(int a)
+        public void Go(object a)
         {
-            var q = a++;
-            a = q;
         }
     }
 

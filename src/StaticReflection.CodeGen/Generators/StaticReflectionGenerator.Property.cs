@@ -134,7 +134,7 @@ namespace StaticReflection.CodeGen.Generators
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public object GetValueAnonymous(object instance)
         {{
-            return ({property.Type})GetValue(({targetType})instance);
+            return (object)GetValue(({targetType})instance);
         }}
     }}
 ";
