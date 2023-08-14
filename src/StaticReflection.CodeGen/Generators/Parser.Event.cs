@@ -3,7 +3,7 @@ using System.Text;
 
 namespace StaticReflection.CodeGen.Generators
 {
-    public partial class StaticReflectionGenerator
+    partial class Parser
     {
         protected List<string> ExecuteEvents(SourceProductionContext context, GeneratorTransformResult<ISymbol> node, INamedTypeSymbol targetType)
         {

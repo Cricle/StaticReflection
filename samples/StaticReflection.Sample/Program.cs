@@ -50,6 +50,7 @@ namespace WW
     [StaticReflectionAssembly(AssemblyName = "System")]
     public partial class C
     {
+        public int A { get; set; }
     }
     [StaticReflectionAssembly]
     public partial class C1

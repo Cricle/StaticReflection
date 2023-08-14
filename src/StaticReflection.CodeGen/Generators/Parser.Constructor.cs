@@ -4,7 +4,7 @@ using System.Text;
 
 namespace StaticReflection.CodeGen.Generators
 {
-    public partial class StaticReflectionGenerator
+    partial class Parser
     {
         protected string CreateSymbolProperties(SemanticModel model, ISymbol symbol)
         {
